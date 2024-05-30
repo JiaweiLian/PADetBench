@@ -129,7 +129,7 @@ def get_blueprint_list(world, actor_type='vehicle', adv_type='clean'):
     # filter the adversarial types in the blueprint list
     if adv_type == 'clean':
         blueprint_list = [blueprint for blueprint in blueprint_list if blueprint.id.find('adv')==-1]
-    elif adv_type.contains('adv'):
+    elif adv_type.find('adv') != -1:
         blueprint_list = [blueprint for blueprint in blueprint_list if blueprint.id.find(adv_type)!=-1]
     return blueprint_list
     
