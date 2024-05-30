@@ -97,7 +97,7 @@ def settings_complete(blueprint_list, settings, grid=True):
     if 'spawnpoint_list' not in settings:
         settings['spawnpoint_list'] = [world.get_map().get_spawn_points()[0]]
     if 'blueprint_list' not in settings:
-        settings['blueprint_list'] = [blueprint_list.contains('vehicle.audi.etron')]
+        settings['blueprint_list'] = [blueprint for blueprint in blueprint_list if blueprint.id.find('audi.etron')!=-1]
     if 'theta_list' not in settings:
         settings['theta_list'] = [math.pi/3]
     if 'phi_list' not in settings:
@@ -124,12 +124,13 @@ def get_blueprint_list(world, actor_type='vehicle', adv_type='clean'):
     
     # filter the example types in the blueprint list
     for example_type in example_types[actor_type]:
-        blueprint_list = [blueprint for blueprint in blueprint_list if blueprint.id.contains(example_type)]
+        blueprint_list = [blueprint for blueprint in blueprint_list if blueprint.id.find(example_type)!=-1]
 
+    # filter the adversarial types in the blueprint list
     if adv_type == 'clean':
-        blueprint_list = [blueprint for blueprint in blueprint_list if not blueprint.id.contains('adv')]
+        blueprint_list = [blueprint for blueprint in blueprint_list if blueprint.id.find('adv')==-1]
     elif adv_type.contains('adv'):
-        blueprint_list = [blueprint for blueprint in blueprint_list if blueprint.id.contains(adv_type)]
+        blueprint_list = [blueprint for blueprint in blueprint_list if blueprint.id.find(adv_type)!=-1]
     return blueprint_list
     
 
