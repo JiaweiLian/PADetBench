@@ -188,8 +188,11 @@ class Actor:
         self.spawn_point = None
         
     def create_actor(self, blueprint, spawn_point):
+        # Check if the blueprint and spawn point are the same
         if self.blueprint == blueprint and self.spawn_point == spawn_point:
             return
+        self.blueprint = blueprint
+        self.spawn_point = spawn_point
         
         # Destroy the previous actor
         if self.actor is not None:
