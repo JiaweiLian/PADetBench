@@ -79,7 +79,7 @@ def world_close(world):
 
 def settings_complete(settings, dataset_len=100):
     if 'spawnpoint_list' not in settings:
-        settings['spawnpoint_list'] = [0] * dataset_len
+        settings['spawnpoint_list'] = [world.get_map().get_spawn_points()[0]] * dataset_len
     if 'blueprint_list' not in settings:
         settings['blueprint_list'] = [world.get_blueprint_library().filter('vehicle.*').filter('^2Wheeled')[0] * dataset_len]
     if 'theta_list' not in settings:
@@ -110,8 +110,12 @@ if __name__ == '__main__':
     # benchmark settings
     if args.benchmark == 'vehicle':
         dataset_name='vehicle'
-        settings['blueprint_list'] = world.get_blueprint_library().filter('vehicle.*').filter('^motorcycle*')
+        settings['blueprint_list'] = world.get_blueprint_library().filter('vehicle.*')
         dataset_len = len(settings['blueprint_list'])
+    if args.benchmark == 'spot':
+        dataset_name='spot'
+        settings['spawnpoint_list'] = world.get_map().get_spawn_points()
+        dataset_len = len(settings['spawnpoint_list'])
     if args.benchmark == 'rotation-theta':
         dataset_name='rotation-theta'
         dataset_len = default_dataset_len

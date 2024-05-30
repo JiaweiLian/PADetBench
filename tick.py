@@ -202,14 +202,9 @@ class Actor:
         # Destroy the previous actor
         if self.actor is not None:
             self.actor.destroy()
-
-        # Choose a spawn location
-        # In this example, we're spawningradius of the circle the vehicle at a random location
-        spawn_points = self.world.get_map().get_spawn_points()  # len(transforms) = 155 for Town10HD_Opt
-        actor_transform = spawn_points[spawn_point]
         
         # Spawn the vehicle
-        self.actor = self.world.spawn_actor(blueprint, actor_transform)
+        self.actor = self.world.spawn_actor(blueprint, spawn_point)
 
         while True:
             prev_location = self.get_location()
