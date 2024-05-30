@@ -5,6 +5,7 @@ import queue
 import cv2
 import carla
 from pascal_voc_writer import Writer
+from tick import Camera
 
 def get_image_point(loc, K, w2c):
     # Calculate 2D projection of 3D coordinate
@@ -44,39 +45,11 @@ def get_2d_bb(verts, K, world_2_camera):
 
     return x_max, x_min, y_max, y_min
 
-def build_projection_matrix(w, h, fov):
-    focal = w / (2.0 * np.tan(fov * np.pi / 360.0))
-    K = np.identity(3)
-    K[0, 0] = K[1, 1] = focal
-    K[0, 2] = w / 2.0
-    K[1, 2] = h / 2.0
-    return K
-
 class DatasetGenerator:
-    def __init__(self, world, spectator, save_path, dataset_name, sensor_blueprint_id='sensor.camera.rgb', image_width='800', image_height='600') -> None:
+    def __init__(self, world, camera: Camera, save_path: str, dataset_name: str) -> None:
         self.world = world
         self.spectator = spectator
-        
-        # Create a blueprint for the camera
-        camera_blueprint = world.get_blueprint_library().find(sensor_blueprint_id)
-        camera_blueprint.set_attribute('image_size_x', image_width)
-        camera_blueprint.set_attribute('image_size_y', image_height)
-
-        # Get the camera attributes
-        camera_initial_transform = carla.Transform(carla.Location(x=0.0, y=0.0, z=2.0))  
-        self.camera = world.spawn_actor(camera_blueprint, camera_initial_transform, attach_to=spectator.base_spectator)
-        
-        # Create a queue to store and retrieve the sensor data
-        self.image_queue = queue.Queue()
-        self.camera.listen(self.image_queue.put)
-
-        # Get the attributes from the camera
-        self.image_w = camera_blueprint.get_attribute("image_size_x").as_int()
-        self.image_h = camera_blueprint.get_attribute("image_size_y").as_int()
-        fov = camera_blueprint.get_attribute("fov").as_float()
-
-        # Calculate the camera projection matrix to project from 3D -> 2D
-        self.K = build_projection_matrix(self.image_w, self.image_h, fov)
+        self.camera = camera
 
         self.annotation_id = 1
         self.coco_label_json = {
@@ -90,7 +63,6 @@ class DatasetGenerator:
         for caftegory, category_id in self.coco_categories.items():
             self.coco_label_json['categories'].append({'supercategory': 'none', 'id': category_id, 'name': caftegory})
 
-
         # saving parameters
         if not os.path.exists(save_path):
             os.makedirs(save_path)
@@ -98,7 +70,7 @@ class DatasetGenerator:
         self.save_path = os.path.join(save_path, dataset_name)
         if not os.path.exists(self.save_path):
             os.makedirs(self.save_path)
-        self.writer = Writer(self.save_path, self.image_w, self.image_h)
+        self.writer = Writer(self.save_path, camera.image_w, camera.image_h)
 
     def add_3dbb_to_img(self, img, verts, world_2_camera):
         edges = [[0,1], [1,3], [3,2], [2,0], [0,4], [4,5], [5,1], [5,7], [7,6], [6,4], [6,2], [7,3]]
@@ -115,64 +87,58 @@ class DatasetGenerator:
         cv2.line(img, (int(x_max),int(y_min)), (int(x_max),int(y_max)), (0,0,255, 255), 1)
 
     def save_data(self, save_images = True, save_pascal_voc = False, save_images_with_2d_bb = False, save_images_with_3d_bb = False):
+        # Get the camera matrix 
+        world_2_camera = self.camera.get_matrix()
 
-        image = self.image_queue.get()
+        # Initialize the exporter of pascal voc format
+        verts = self.camera.get_vertices()
+        x_max, x_min, y_max, y_min = get_2d_bb(verts, self.camera.K, world_2_camera)
+
+        if not self.camera.is_in_view():
+            return
+        
+        if not (x_min > 0 and x_max < self.camera.image_w and y_min > 0 and y_max < self.camera.image_h):
+            return
+
+        # image processing
+        image = self.camera.get_image()
         img = np.reshape(np.copy(image.raw_data), (image.height, image.width, 4))
 
-        # Get the camera matrix 
-        world_2_camera = np.array(self.camera.get_transform().get_inverse_matrix())
-        
+        # Add the object to the frame (ensure it is inside the image)
         # weather_string = str(weather).replace(' ', '_').replace(':', '').replace(',', '').replace('(', '_').replace(')', '').replace('=', '').replace('%', '').replace('.', '_')
         # image_id = '%06d' % angle_degree + '_R%02d' % radius + '_H%02d_' % height + weather_string + '_' + map  # Detailed information of the image
-        image_id = '%06d' % self.spectator.angle_degree
+        image_id = '%06d' % self.camera.angle_degree
         image_name = image_id + '.png'
 
         image_json = {'file_name': image_name, 'height': image.height, 'width': image.width, 'id': int(image_id)}
         self.coco_label_json['images'].append(image_json)
 
-        output_path = os.path.join(self.save_path, 'val2017', image_name)
+        self.writer.addObject('car', x_min, y_min, x_max, y_max)
+
+        npc_width = abs(x_max - x_min)
+        npc_height = abs(y_max - y_min)
+        annotation = {'area': npc_width * npc_height, 
+                    'iscrowd': 0, 
+                    'image_id': int(image_id), 
+                    'bbox': [x_min, y_min, npc_width, npc_height], 
+                    'category_id': self.coco_categories['car'], 
+                    'id': self.annotation_id, 
+                    'ignore': 0, 
+                    'segmentation': []
+                    }
+        self.coco_label_json['annotations'].append(annotation)
+        self.annotation_id += 1
+
         # Save the image
         if save_images:
+            output_path = os.path.join(self.save_path, 'val2017', image_name)
             image.save_to_disk(output_path)
 
-        # Initialize the exporter of pascal voc format
-        for npc in self.world.get_actors().filter('*vehicle*'):
-            bb = npc.bounding_box
-            dist = npc.get_transform().location.distance(self.spectator.get_transform().location)
-            if dist > 50:
-                continue
-            
-            forward_vec = self.spectator.get_transform().get_forward_vector()
-            ray = npc.get_transform().location - self.spectator.get_transform().location
-            if forward_vec.dot(ray) > 1:
-                verts = [v for v in bb.get_world_vertices(npc.get_transform())]
-                # p1 = get_image_point(bb.location, self.K, world_2_camera)
+        if save_images_with_3d_bb:
+            self.add_3dbb_to_img(img, verts, world_2_camera)
 
-                x_max, x_min, y_max, y_min = get_2d_bb(verts, self.K, world_2_camera)
-                    
-                # Add the object to the frame (ensure it is inside the image)
-                if x_min > 0 and x_max < self.image_w and y_min > 0 and y_max < self.image_h: 
-                    self.writer.addObject('car', x_min, y_min, x_max, y_max)
-
-                    npc_width = abs(x_max - x_min)
-                    npc_height = abs(y_max - y_min)
-                    annotation = {'area': npc_width * npc_height, 
-                                'iscrowd': 0, 
-                                'image_id': int(image_id), 
-                                'bbox': [x_min, y_min, npc_width, npc_height], 
-                                'category_id': self.coco_categories['car'], 
-                                'id': self.annotation_id, 
-                                'ignore': 0, 
-                                'segmentation': []
-                                }
-                    self.coco_label_json['annotations'].append(annotation)
-                    self.annotation_id += 1
-
-                if save_images_with_3d_bb:
-                    self.add_3dbb_to_img(img, verts, world_2_camera)
-
-                if save_images_with_2d_bb:
-                    self.add_2dbb_to_img(img, verts, world_2_camera)
+        if save_images_with_2d_bb:
+            self.add_2dbb_to_img(img, verts, world_2_camera)
 
         if save_pascal_voc:
             # Save the bounding boxes in the scene

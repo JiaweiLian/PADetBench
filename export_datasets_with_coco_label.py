@@ -9,7 +9,7 @@ import keyboard
 import numpy as np
 import cv2
 import json
-from tick import Weather, Spectator
+from tick import Weather, Camera
 from data_process import DatasetGenerator
 
 
@@ -50,7 +50,7 @@ def run(
     world.apply_settings(settings)
 
     # Get the spectator
-    spectator = Spectator(world.get_spectator(), vehicle, radius, height)
+    camera = Camera(world, vehicle, radius, height)
 
     # Attach the camera to the spectator
     # The camera's transform relative to the spectator is set same as camera attach to the ego vehicle, otherwise the calculated bounding box will be inaccurate
@@ -62,13 +62,13 @@ def run(
     dataset_name = 'output' + '_rs%02.2f' % speed_rotation_degree + '_ws%02.2f' % speed_weather_changing + "_" + vehicle_blueprint_id.split('.')[-1]
 
     # Create the dataset generator
-    datasetGenerator = DatasetGenerator(world, spectator, save_path, dataset_name)
+    datasetGenerator = DatasetGenerator(world, camera, save_path, dataset_name)
 
     # time.sleep(3)  # Wait for the car landing before taking the first image
 
-    while spectator.angle_degree < total_rotation_degree:
+    while camera.angle_degree < total_rotation_degree:
         # Update the spectator
-        spectator.tick(speed_rotation_degree)
+        camera.tick(speed_rotation_degree)
 
         # Update the weather
         weather.tick(speed_weather_changing)
@@ -79,7 +79,7 @@ def run(
         world.tick()
 
         # Save the data in the pascal voc format
-        datasetGenerator.save_data(save_images=False)
+        datasetGenerator.save_data(save_images=True, save_pascal_voc=True, save_images_with_2d_bb=True, save_images_with_3d_bb=True)
 
         if keyboard.is_pressed('q'):  
             print('You pressed q, loop will break')

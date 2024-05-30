@@ -1,4 +1,7 @@
+import re
+import numpy as np
 import math
+import queue
 import carla
 
 def clamp(value, minimum=0.0, maximum=100.0):
@@ -69,23 +72,79 @@ class Weather:
     def __str__(self):
         return '%s %s' % (self.sun, self.storm)
 
+def build_projection_matrix(w, h, fov):
+    focal = w / (2.0 * np.tan(fov * np.pi / 360.0))
+    K = np.identity(3)
+    K[0, 0] = K[1, 1] = focal
+    K[0, 2] = w / 2.0
+    K[1, 2] = h / 2.0
+    return K
+
 # Define a function that calculates the transform of the spectator
-class Spectator:
-    def __init__(self, base_spectator, vehicle, radius, height):
-        self.base_spectator = base_spectator
+class Camera:
+    def __init__(self, world, vehicle, radius, height, sensor_blueprint_id='sensor.camera.rgb', image_width='800', image_height='600'):
+        self.base_spectator = world.get_spectator()
         self.vehicle = vehicle
         self.radius = radius
         self.height = height
         self.angle_degree = 0.0
         self.tick(0.0)
 
+        # Create a blueprint for the camera
+        camera_blueprint = world.get_blueprint_library().find(sensor_blueprint_id)
+        camera_blueprint.set_attribute('image_size_x', image_width)
+        camera_blueprint.set_attribute('image_size_y', image_height)
+
+        # Get the camera attributes
+        camera_initial_transform = carla.Transform(carla.Location(x=0.0, y=0.0, z=2.0))  
+        self.camera = world.spawn_actor(camera_blueprint, camera_initial_transform, attach_to=self.base_spectator)
+
+        # Get the attributes from the camera
+        self.image_w = camera_blueprint.get_attribute("image_size_x").as_int()
+        self.image_h = camera_blueprint.get_attribute("image_size_y").as_int()
+        self.fov = camera_blueprint.get_attribute("fov").as_float()
+
+        # Create a queue to store and retrieve the sensor data
+        self.image_queue = queue.Queue()
+        self.camera.listen(self.image_queue.put)
+
+        # Calculate the camera projection matrix to project from 3D -> 2D
+        self.K = build_projection_matrix(self.image_w, self.image_h, self.fov)
+
+    def is_vehicle_in_shot(self):
+        forward_vec = self.base_spectator.get_transform().get_forward_vector()
+        # ray = self.vehicle.get_transform().location - self.base_spectator.get_transform().location
+        ray = self.vehicle.get_location().get_transform().location - self.base_spectator.get_transform().location
+        return forward_vec.dot(ray) > 1
+    
+    def get_vertices(self):
+        # verts = [v for v in self.vehicle.bounding_box.get_world_vertices(self.vehicle.get_transform())]
+        verts = [v for v in self.vehicle.get_location().bounding_box.get_world_vertices(self.vehicle.get_transform())]
+
+        # p1 = get_image_point(npc.bounding_box.location, self.camera.K, world_2_camera)
+        return verts
+
+    def get_transform(self):
+        return self.camera.get_transform()
+    
+    def get_matrix(self):
+        return np.array(self.get_transform().get_inverse_matrix())
+
+    def get_shape(self):
+        return self.camera_blueprint.get_attribute('image_size_x'), self.camera_blueprint.get_attribute('image_size_y')
+
+    def get_image(self):
+        self.image_queue.get()
+
     def tick(self, speed_rotation_degree):
         # Update the angle of the spectator
         self.angle_degree += speed_rotation_degree
-        angle_radian = (math.pi * 2.0 / 360.0) * self.angle_degree
 
         # Get the location of the vehicle
         vehicle_location = self.vehicle.get_location()
+
+        # Calculate the angle in radians
+        angle_radian = (math.pi * 2.0 / 360.0) * self.angle_degree
 
         # Calculate the new location of the spectator
         location = carla.Location()
@@ -99,11 +158,10 @@ class Spectator:
         rotation.pitch = -math.degrees(math.atan(self.height / self.radius))  # Pitch angle_radian
 
         # Create a new transform with the new location and the new rotation
-        transform = carla.Transform(location, rotation)
-        transform.location.z -= 2.0
+        spectator_transform = carla.Transform(location, rotation)
+        spectator_transform.location.z -= 2.0
 
         # Set the new transform to the spectator
-        self.base_spectator.set_transform(transform)
+        self.base_spectator.set_transform('spectator_transform')
 
-    def get_transform(self):
-        return self.base_spectator.get_transform()
+    
