@@ -1,21 +1,9 @@
-from ast import arg
-from calendar import c
-import dis
-from re import T
-
-from scipy import datasets
-from traitlets import default
 import carla
-import random
 import math
-import time
-import os
 import argparse
 import sys
 import keyboard
 import numpy as np
-import cv2
-import json
 from tick import Weather, Camera, Actor
 from data_process import DatasetGenerator
 
@@ -199,7 +187,7 @@ if __name__ == '__main__':
 
     if args.benchmark == 'distance':
         dataset_name='distance'
-        settings['radius_list'] = [i/default_dataset_len * rescale(i, *distance_range) for i in range(default_dataset_len)]
+        settings['radius_list'] = [rescale(i/default_dataset_len, *distance_range) for i in range(default_dataset_len)]
 
     if args.benchmark == 'entire':
         dataset_name='entire'
@@ -212,7 +200,7 @@ if __name__ == '__main__':
         settings['spawnpoint_list'] = world.get_map().get_spawn_points()[:3]
         settings['theta_list'] = [i/theta_len * (math.pi / 2) for i in range(1, theta_len)] # without theta = 0, i.e., no overhead view
         settings['phi_list'] = [i/phi_len * (2 * math.pi) for i in range(phi_len)]
-        settings['radius_list'] = [i/distance_len * rescale(i, *distance_range) for i in range(distance_len)]
+        settings['radius_list'] = [rescale(i/distance_len, *distance_range) for i in range(distance_len)]
 
     settings = settings_complete(blueprint_list, settings)
 
