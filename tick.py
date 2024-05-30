@@ -127,8 +127,6 @@ class Camera:
     
     def get_vertices(self):
         verts = [v for v in self.vehicle.get_bounding_box().get_world_vertices(self.vehicle.get_transform())]
-
-        # p1 = get_image_point(npc.bounding_box.location, self.camera.K, world_2_camera)
         return verts
 
     def get_transform(self):
@@ -183,18 +181,24 @@ class Camera:
         # time.sleep(0.1)
 
 class Actor:
-    def __init__(self, world, blueprint_id, spawn_point) -> None:
-        # Get the blueprint library and filter for the vehicle blueprints
-        blueprint = world.get_blueprint_library().find(blueprint_id)
+    def __init__(self, world) -> None:
+        self.world = world
+        self.actor = None
         
+    def create_actor(self, blueprint, spawn_point):
         # Choose a spawn location
         # In this example, we're spawningradius of the circle the vehicle at a random location
-        spawn_points = world.get_map().get_spawn_points()  # len(transforms) = 155 for Town10HD_Opt
+        spawn_points = self.world.get_map().get_spawn_points()  # len(transforms) = 155 for Town10HD_Opt
         actor_transform = spawn_points[spawn_point]
         
         # Spawn the vehicle
-        self.actor = world.spawn_actor(blueprint, actor_transform)
-        time.sleep(1)  # Wait for the vehicle to be ready
+        self.actor = self.world.spawn_actor(blueprint, actor_transform)
+
+        while True:
+            prev_location = self.get_location()
+            self.world.tick()
+            if prev_location == self.get_location():
+                break
 
     def get_transform(self):
         return self.actor.get_transform()

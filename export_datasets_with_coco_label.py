@@ -17,30 +17,19 @@ from data_process import DatasetGenerator
 
 
 def run(
+        world,  # Name of the map
+        spawn_point,  # Index of the spawn point: 0-154 (Town10HD_Opt)
+        blueprint_list,  # Blueprint ID of the vehicle
+        theta_list,  # Rotation range of the camera
+        phi_list,  # Height of the spectator
+        radius_list,  # Enable dolly
+        weather_list,  # Enable weather changing
         dataset_name = 'dataset',  # Define the dataset name
         save_path = 'data',  # Define the output directory
-        map='Town10HD_Opt',  # Name of the map
-        spawn_point=0,  # Index of the spawn point: 0-154 (Town10HD_Opt)
-        vehicle_blueprint_id='vehicle.audi.etron',  # Blueprint ID of the vehicle
-        theta_list = [math.pi/3],  # Rotation range of the camera
-        phi_list = [0],  # Height of the spectator
-        radius_list = [5],  # Enable dolly
-        weather_list = [100],  # Enable weather changing
-        
 ):
-
-    # Connect to the client and retrieve the world object
-    client = carla.Client('localhost', 2000)
-    world = client.load_world(map)
     
     # create a vehicle
-    vehicle = Actor(world, vehicle_blueprint_id, spawn_point)
-
-    # Set up the simulator in synchronous mode
-    settings = world.get_settings()
-    settings.synchronous_mode = True # Enables synchronous mode
-    settings.fixed_delta_seconds = 0.05
-    world.apply_settings(settings)
+    vehicle = Actor(world, blueprint_list[0], spawn_point[0])
 
     # create a camera
     camera = Camera(world, vehicle)
@@ -83,6 +72,22 @@ def run(
     # Destroy the vehicle
     del vehicle
 
+
+def world_init(map):
+    # Connect to the client and retrieve the world object
+    client = carla.Client('localhost', 2000)
+    world = client.load_world(map)
+
+    # Set up the simulator in synchronous mode
+    settings = world.get_settings()
+    settings.synchronous_mode = True # Enables synchronous mode
+    settings.fixed_delta_seconds = 0.05
+    world.apply_settings(settings)
+
+    return world
+
+def world_close(world):
+    settings = world.get_settings()
     settings.synchronous_mode = False # Enables synchronous mode
     world.apply_settings(settings)
 
@@ -94,8 +99,12 @@ if __name__ == '__main__':
     parser.add_argument('--benchmark', type=str, choices=['entire', 'weather', 'distance', 'rotation-theta', 'rotation-phi', 'spot', 'random'], default='entire', help='Name of the benchmark')
 
     args = parser.parse_args()
-    
+
+    world = world_init(args.map)
+
     dataset_len = 100
+    spawnpoint_list = [0]
+    blueprint_list = world.get_blueprint_library().filter('vehicle.*')[0:1]
     theta_list = [math.pi/3] * dataset_len
     phi_list = [0] * dataset_len
     radius_list = [5] * dataset_len
@@ -113,9 +122,10 @@ if __name__ == '__main__':
     if args.benchmark == 'weather':
         dataset_name='weather'
         weather_list = [i * 1 for i in range(dataset_len)]
-    if args.benchmark == 'random':
-        len = 10000
-        rotate_angles = [random.randint(0, 360) for _ in range(len)]
-        dolly_radius = [random.randint(1, 50) for _ in range(len)]
-        weather_deltas = range(0,len,10)
-    run(dataset_name=dataset_name, save_path=args.save_path, map=args.map, theta_list=theta_list, phi_list=phi_list, radius_list=radius_list, weather_list=weather_list)
+    if args.benchmark == 'vehicle':
+        dataset_name='vehicle'
+        blueprint_list = world.get_blueprint_library().filter('vehicle.*')
+    run(world=world, spawnpoint_list=spawnpoint_list, blueprint_list=blueprint_list, theta_list=theta_list, phi_list=phi_list, radius_list=radius_list, weather_list=weather_list, dataset_name=dataset_name, save_path=args.save_path)
+
+    world_close(world)
+    
