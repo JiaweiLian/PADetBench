@@ -75,7 +75,7 @@ class DatasetGenerator:
         edges = [[0,1], [1,3], [3,2], [2,0], [0,4], [4,5], [5,1], [5,7], [7,6], [6,4], [6,2], [7,3]]
         for edge in edges:
             p1x, p1y = get_image_point(verts[edge[0]], K, world_2_camera)
-            p2x, p2y = get_image_point(verts[edge[1]],  self.K, world_2_camera)
+            p2x, p2y = get_image_point(verts[edge[1]],  K, world_2_camera)
             cv2.line(img, (int(p1x),int(p1y)), (int(p2x),int(p2y)), (255,0,0, 255), 1)
 
     def add_2dbb_to_img(self, img, verts, K, world_2_camera):
