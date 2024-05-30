@@ -105,7 +105,7 @@ if __name__ == '__main__':
 
     dataset_len = 100
     spawnpoint_list = [0]
-    blueprint_list = world.get_blueprint_library().filter('vehicle.*')[0:1]
+    blueprint_list = [world.get_blueprint_library().filter('vehicle.*')[i] for i in range(1)]
     theta_list = [math.pi/3] * dataset_len
     phi_list = [0] * dataset_len
     radius_list = [5] * dataset_len
