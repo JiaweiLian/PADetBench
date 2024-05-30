@@ -106,7 +106,6 @@ if __name__ == '__main__':
     if args.benchmark == 'rotation-phi':
         dataset_name='rotation-phi'
         phi_list = [i/dataset_len * (2 * math.pi) for i in range(dataset_len)]
-        range(0, 2*math.pi, 2*math.pi/dataset_len)
     if args.benchmark == 'distance':
         dataset_name='distance'
         radius_list = [i/dataset_len * 50 + 1 for i in range(dataset_len)]
