@@ -86,10 +86,10 @@ class Camera:
     def __init__(self, world, vehicle, sensor_blueprint_id='sensor.camera.rgb', image_width='800', image_height='600'):
         self.base_spectator = world.get_spectator()
         self.vehicle = vehicle
-        self.radius = 0.0
+        self.radius = 5.0
         self.height = 0.0
         self.angle_degree = 0.0
-        self.tick(0.0)
+        self.tick()
 
         # Create a blueprint for the camera
         camera_blueprint = world.get_blueprint_library().find(sensor_blueprint_id)
@@ -141,12 +141,8 @@ class Camera:
         self.angle_degree = angle_degree
         self.tick()
 
-    def dolly(self, radius):
+    def dolly(self, radius, height):
         self.radius = radius
-        self.tick()
-
-    def height(self, height):
-        self.height = height
         self.tick()
 
     def tick(self):

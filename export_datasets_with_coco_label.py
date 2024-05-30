@@ -50,8 +50,7 @@ def run(
     iteration_len = max(len(rotate_angles), len(dolly_radius), len(dolly_heights), len(weather_deltas))
     for i in range(iteration_len):
         camera.rotate(rotate_angles[i%len(rotate_angles)])
-        camera.dolly(dolly_radius[i%len(dolly_radius)])
-        camera.height(dolly_heights[i%len(dolly_heights)])
+        camera.dolly(dolly_radius[i%len(dolly_radius)], dolly_heights[i%len(dolly_heights)])
         weather.tick(weather_deltas[i%len(weather_deltas)]-weather_deltas[(i-1)%len(weather_deltas)])
 
         sys.stdout.write('\r' + str(weather) + 12 * ' ')
