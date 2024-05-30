@@ -166,6 +166,8 @@ class Camera:
 
     def tick(self):
 
+        self.actor_location = self.actor.get_location()
+
         # Calculate the new location of the spectator
         location = carla.Location()
         location.x = self.actor_location.x + self.radius * math.sin(self.theta) * math.cos(self.phi)
@@ -210,6 +212,7 @@ class Actor:
         # Spawn the vehicle
         self.actor = self.world.spawn_actor(blueprint, spawn_point)
 
+        # Wait until the actor is spawned
         while True:
             prev_location = self.get_location()
             self.world.tick()
