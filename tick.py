@@ -3,6 +3,8 @@ import numpy as np
 import math
 import queue
 import time
+
+from psutil import swap_memory
 import carla
 
 def clamp(value, minimum=0.0, maximum=100.0):
@@ -61,7 +63,12 @@ class Storm:
 class Weather:
     def __init__(self, world):
         self.world = world
-        self.weather = world.get_weather()
+        self.init_weather = world.get_weather()
+        
+        self.reset()
+
+    def reset(self):
+        self.weather = self.init_weather
         self.sun = Sun(self.weather)
         self.storm = Storm(self.weather)
         self.prev_t = 0
@@ -69,6 +76,10 @@ class Weather:
 
     def tick(self, curr_t):
         delta = curr_t - self.prev_t
+        if delta < 0:
+            self.reset()
+            delta = curr_t
+            
         while delta > 0:
             self.sun.tick(min(delta, 10))
             self.storm.tick(min(delta, 10))
