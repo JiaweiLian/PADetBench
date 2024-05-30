@@ -10,9 +10,8 @@ import queue
 import numpy as np
 import cv2
 from pascal_voc_writer import Writer
-import keyboard
 import json
-from weather_tick import Weather
+from tick import Weather
 
 
 def run(
@@ -220,8 +219,8 @@ def run(
             writer.save(output_path.replace('.png', '.xml'))
 
         # Calculate the angle_radian based on the speed
-        angle_radian += (math.pi * 2.0 / 360.0) * speed_rotation_degree
         angle_degree += speed_rotation_degree
+        angle_radian = (math.pi * 2.0 / 360.0) * angle_degree
 
         if save_images_with_bb:
             cv2.imwrite(output_path.replace('.png', '_bb.png'), img)
