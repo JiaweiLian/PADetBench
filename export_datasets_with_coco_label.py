@@ -52,7 +52,7 @@ def run(
         camera.rotate(rotate_angles[i%len(rotate_angles)])
         camera.dolly(dolly_radius[i%len(dolly_radius)])
         camera.height(dolly_heights[i%len(dolly_heights)])
-        weather.update(weather_deltas[i%len(weather_deltas)])
+        weather.tick(weather_deltas[i%len(weather_deltas)]-weather_deltas[(i-1)%len(weather_deltas)])
 
         sys.stdout.write('\r' + str(weather) + 12 * ' ')
         sys.stdout.flush()
@@ -93,5 +93,5 @@ if __name__ == '__main__':
         len = 10000
         rotate_angles = [random.randint(0, 360) for _ in range(len)]
         dolly_radius = [random.randint(1, 50) for _ in range(len)]
-        weather_deltas = [random.randint(0, len) for _ in range(len)]
+        weather_deltas = range(0,len,10)
         run(dataset_name='random', save_path=args.save_path, map=args.map, rotate_angles=rotate_angles, dolly_radius=dolly_radius, dolly_heights=[5], weather_deltas=weather_deltas)
