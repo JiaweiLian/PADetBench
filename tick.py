@@ -158,6 +158,7 @@ class Camera:
         self.tick()
 
     def tick(self):
+
         # Get the location of the vehicle
         vehicle_location = self.vehicle.get_location()
 
@@ -175,10 +176,14 @@ class Camera:
         # Create a new transform with the new location and the new rotation
         spectator_transform = carla.Transform(location, rotation)
 
+        # Get the transform of the camera before the tick
+        prev_transform = self.get_transform()
+
         # Set the new transform to the spectator
         self.base_spectator.set_transform(spectator_transform)
         
-        # time.sleep(0.1)
+        while prev_transform != self.get_transform():
+            self.world.tick()
 
 class Actor:
     def __init__(self, world) -> None:

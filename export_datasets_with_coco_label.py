@@ -45,11 +45,6 @@ def run(
         sys.stdout.write('\r' + str(weather) + 12 * ' ')
         sys.stdout.flush()
 
-        camera_transform_before_tick = camera.get_transform()
-        while camera_transform_before_tick == camera.get_transform():
-            time.sleep(0.0001)
-            world.tick()
-
         # Save the data in the pascal voc format
         # datasetGenerator.save_data(save_images=True, save_pascal_voc=True, save_images_with_2d_bb=True, save_images_with_3d_bb=True)
         datasetGenerator.save_data(save_images=True)
@@ -103,7 +98,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--save_path', type=str, default='data', help='Name of the output directory')
     parser.add_argument('--map', type=str, default='Town10HD_Opt', help='Name of the map')
-    parser.add_argument('--benchmark', type=str, choices=['entire', 'weather', 'distance', 'rotation-theta', 'rotation-phi', 'spot', 'random'], default='entire', help='Name of the benchmark')
+    parser.add_argument('--benchmark', type=str, choices=['vehicle', 'weather', 'distance', 'rotation-theta', 'rotation-phi', 'spot', 'random'], default='entire', help='Name of the benchmark')
     args = parser.parse_args()
 
     world = world_init(args.map)    
