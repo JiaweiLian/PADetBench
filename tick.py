@@ -78,9 +78,11 @@ class Weather:
         self.tick(0)
 
     def tick(self, curr_t):
-        delta = curr_t - self.prev_t
-        if delta == 0:
+
+        if curr_t == self.prev_t:
             return
+
+        delta = curr_t - self.prev_t
 
         if delta < 0:
             self.sun.reset()
@@ -185,10 +187,6 @@ class Camera:
         self.tick()
 
     def tick(self):
-
-        if self.actor_location == self.actor.get_location():
-            return
-
         self.actor_location = self.actor.get_location()
 
         # Calculate the new location of the spectator
