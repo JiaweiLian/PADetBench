@@ -126,6 +126,7 @@ if __name__ == '__main__':
         settings['phi_list'] = [i/sphere_decompose_dataset_len * (2 * math.pi) for i in range(sphere_decompose_dataset_len)]
         settings['phi_list'] = settings['phi_list'] * sphere_decompose_dataset_len * blueprint_decompose_dataset_len
         
+        dataset_len = len(settings['blueprint_list'])
 
     if args.benchmark == 'spot':
         dataset_name='spot'
