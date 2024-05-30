@@ -135,12 +135,6 @@ class Camera:
         # Create a queue to store and retrieve the sensor data
         self.image_queue = queue.Queue()
         self.camera.listen(self.image_queue.put)
-
-
-    def is_in_view(self):
-        forward_vec = self.base_spectator.get_transform().get_forward_vector()
-        ray = self.actor.get_transform().location - self.base_spectator.get_transform().location
-        return forward_vec.dot(ray) > 1
     
     def get_vertices(self):
         verts = [v for v in self.actor.get_bounding_box().get_world_vertices(self.actor.get_transform())]

@@ -98,15 +98,15 @@ def settings_complete(blueprint_list, settings, grid=True):
         settings['spawnpoint_list'] = [world.get_map().get_spawn_points()[0]]
     if 'blueprint_list' not in settings:
         settings['blueprint_list'] = [blueprint for blueprint in blueprint_list if blueprint.id.find('audi.etron')!=-1]
+    if 'weather_list' not in settings:
+        # weather_delta = 1000 represents sunny weather
+        settings['weather_list'] = [1000]
     if 'theta_list' not in settings:
         settings['theta_list'] = [math.pi/3]
     if 'phi_list' not in settings:
         settings['phi_list'] = [0]
     if 'radius_list' not in settings:
         settings['radius_list'] = [7]
-    if 'weather_list' not in settings:
-        # weather_delta = 1000 represents sunny weather
-        settings['weather_list'] = [1000]
 
     if grid:
         # repeat the settings to match the dataset length
@@ -199,14 +199,14 @@ if __name__ == '__main__':
         dataset_name='entire'
         theta_len = 3
         phi_len = 8
-        distance_len = 5
         weather_len = 10
+        distance_len = 5
         settings['blueprint_list'] = blueprint_list[:3]
         settings['weather_list'] = [40,60,80,100,150,180,200,220,250,280]
         settings['theta_list'] = [i/theta_len * (math.pi / 2) for i in range(1, theta_len)] # without theta = 0, i.e., no overhead view
         settings['phi_list'] = [i/phi_len * (2 * math.pi) for i in range(phi_len)]
         settings['spawnpoint_list'] = world.get_map().get_spawn_points()[:3]
-        settings['radius_list'] = [i/distance_len * 10 + 7 for i in range(distance_len)]
+        settings['radius_list'] = [i/distance_len * 10 + 5 for i in range(distance_len)]
 
     settings = settings_complete(blueprint_list, settings)
 

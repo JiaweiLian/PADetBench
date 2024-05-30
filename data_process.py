@@ -93,11 +93,11 @@ class DatasetGenerator:
         verts = self.camera.get_vertices()
         x_max, x_min, y_max, y_min = get_2d_bb(verts, self.camera.K, world_2_camera)
 
-        if not self.camera.is_in_view():
-            return
-        
-        if not (x_min > 0 and x_max < self.camera.image_w and y_min > 0 and y_max < self.camera.image_h):
-            return
+        # Ensure the bounding box is inside the image
+        x_min = max(0, x_min)
+        x_max = min(self.camera.image_w, x_max)
+        y_min = max(0, y_min)
+        y_max = min(self.camera.image_h, y_max)
 
         # image processing
         image = self.camera.get_image()
