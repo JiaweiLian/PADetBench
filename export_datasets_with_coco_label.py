@@ -120,11 +120,11 @@ def settings_complete(blueprint_list, settings, grid=True):
 def get_blueprint_list(world, actor_type='vehicle', adv_type='clean'):
     example_types = dict()
     example_types['vehicle'] = ['audi.etron', 'bmw.grandtourer', 'chevrolet.impala', 'jeep.wrangler_rubicon', 'mini.cooper_s', 'nissan.patrol_2021', 'tesla.model3', 'mercedes.spinter', 'mercedes.coupe', 'lincoln.mkz_2020']
-    blueprint_list = world.get_blueprint_library().filter(actor_type+'.*')
+    world_blueprint_list = world.get_blueprint_library().filter(actor_type+'.*')
     
     # filter the example types in the blueprint list
     for example_type in example_types[actor_type]:
-        blueprint_list = [blueprint for blueprint in blueprint_list if blueprint.id.find(example_type)!=-1]
+        blueprint_list += [blueprint for blueprint in world_blueprint_list if blueprint.id.find(example_type)!=-1]
 
     # filter the adversarial types in the blueprint list
     if adv_type == 'clean':
@@ -155,7 +155,7 @@ if __name__ == '__main__':
     if args.benchmark == 'vehicle':
         dataset_name='vehicle'
         theta_len = 3
-        phi_len = 4
+        phi_len = 8
         settings['blueprint_list'] = [blueprint for blueprint in blueprint_list]
         settings['theta_list'] = [i/theta_len * (math.pi / 2) for i in range(1, theta_len)] # without theta = 0, i.e., no overhead view
         settings['phi_list'] = [i/phi_len * (2 * math.pi) for i in range(phi_len)]
