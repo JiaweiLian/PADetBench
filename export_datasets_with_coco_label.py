@@ -188,7 +188,7 @@ if __name__ == '__main__':
         dataset_name='weather'
         settings['weather_list'] = [i * 10 for i in range(default_dataset_len)]
     
-    settings = settings_complete(settings)
+    settings = settings_complete(blueprint_list, settings)
 
     run(world=world, settings=settings, dataset_name=dataset_name, save_path=args.save_path)
 
