@@ -1,5 +1,6 @@
 from ast import arg
 from calendar import c
+from re import T
 
 from traitlets import default
 import carla
@@ -81,19 +82,38 @@ def world_close(world):
     settings.synchronous_mode = False # Enables synchronous mode
     world.apply_settings(settings)
 
-def settings_complete(settings, dataset_len=100):
+def repeat_dataset(dataset, iterator):
+    try:
+        key = next(iterator)
+        repeat_len = repeat_dataset(dataset, iterator)
+        dataset[key] = np.repeat(dataset[key], repeat_len).tolist()
+        return len(dataset[key])
+    except StopIteration:
+        return 1
+
+def settings_complete(settings, grid=True):
+
+    # default settings
     if 'spawnpoint_list' not in settings:
-        settings['spawnpoint_list'] = [world.get_map().get_spawn_points()[0]] * dataset_len
+        settings['spawnpoint_list'] = [world.get_map().get_spawn_points()[0]]
     if 'blueprint_list' not in settings:
-        settings['blueprint_list'] = [world.get_blueprint_library().filter('vehicle.*')[0]] * dataset_len
+        settings['blueprint_list'] = [world.get_blueprint_library().filter('vehicle.*')[0]]
     if 'theta_list' not in settings:
-        settings['theta_list'] = [math.pi/3] * dataset_len
+        settings['theta_list'] = [math.pi/3]
     if 'phi_list' not in settings:
-        settings['phi_list'] = [0] * dataset_len
+        settings['phi_list'] = [0]
     if 'radius_list' not in settings:
-        settings['radius_list'] = [5] * dataset_len
+        settings['radius_list'] = [5]
     if 'weather_list' not in settings:
-        settings['weather_list'] = [1000] * dataset_len
+        settings['weather_list'] = [1000]
+
+    if grid:
+        # repeat the settings to match the dataset length
+        dataset_len = repeat_dataset(settings, iter(settings))    
+        
+        # tile the settings to match the dataset length
+        for key in settings:
+            settings[key] = settings[key] * (dataset_len // len(settings[key]))
 
     return settings
 
@@ -116,47 +136,35 @@ if __name__ == '__main__':
         dataset_name='vehicle'
         theta_len = 3
         phi_len = 4
-        blueprint_list = world.get_blueprint_library().filter('vehicle.*')
-        blueprint_len = len(blueprint_list)
-        settings['blueprint_list'] = [blueprint for blueprint in blueprint_list]
-        settings['blueprint_list'] = np.repeat(settings['blueprint_list'], theta_len * phi_len).tolist()
-        
+        settings['blueprint_list'] = [blueprint for blueprint in world.get_blueprint_library().filter('vehicle.*')]
         settings['theta_list'] = [i/theta_len * (math.pi / 2) for i in range(theta_len)]
-        settings['theta_list'] = np.repeat(settings['theta_list'], phi_len).tolist() * blueprint_len
-
         settings['phi_list'] = [i/phi_len * (2 * math.pi) for i in range(phi_len)]
-        settings['phi_list'] = settings['phi_list'] * theta_len * blueprint_len
-        
-        dataset_len = len(settings['blueprint_list'])
 
     if args.benchmark == 'spot':
         dataset_name='spot'
         settings['spawnpoint_list'] = world.get_map().get_spawn_points()
-        dataset_len = len(settings['spawnpoint_list'])
+        settings['theta_list'] = [i/theta_len * (math.pi / 2) for i in range(theta_len)]
+        settings['phi_list'] = [i/phi_len * (2 * math.pi) for i in range(phi_len)]
+
     if args.benchmark == 'rotation-theta':
         dataset_name='rotation-theta'
-        dataset_len = default_dataset_len
-        settings['theta_list'] = [i/dataset_len * (math.pi / 2) for i in range(dataset_len)]
+        settings['theta_list'] = [i/default_dataset_len * (math.pi / 2) for i in range(default_dataset_len)]
     if args.benchmark == 'rotation-phi':
         dataset_name='rotation-phi'
-        dataset_len = default_dataset_len
-        settings['phi_list'] = [i/dataset_len * (2 * math.pi) for i in range(dataset_len)]
+        settings['phi_list'] = [i/default_dataset_len * (2 * math.pi) for i in range(default_dataset_len)]
     if args.benchmark == 'sphere':
         dataset_name='sphere'
         decompose_dataset_len = int(default_dataset_len ** (1/2))
-        dataset_len = decompose_dataset_len ** 2
-        settings['theta_list'] = [i/decompose_dataset_len * (math.pi / 2) for i in range(decompose_dataset_len)] * decompose_dataset_len
-        settings['phi_list'] = np.repeat([i/decompose_dataset_len * (2 * math.pi) for i in range(decompose_dataset_len)], decompose_dataset_len).tolist()
+        settings['theta_list'] = [i/decompose_dataset_len * (math.pi / 2) for i in range(decompose_dataset_len)]
+        settings['phi_list'] = [i/decompose_dataset_len * (2 * math.pi) for i in range(decompose_dataset_len)]
     if args.benchmark == 'distance':
         dataset_name='distance'
-        dataset_len = default_dataset_len
-        settings['radius_list'] = [i/dataset_len * 10 + 4 for i in range(dataset_len)]
+        settings['radius_list'] = [i/default_dataset_len * 10 + 4 for i in range(default_dataset_len)]
     if args.benchmark == 'weather':
         dataset_name='weather'
-        dataset_len = default_dataset_len
-        settings['weather_list'] = [i * 10 for i in range(dataset_len)]
+        settings['weather_list'] = [i * 10 for i in range(default_dataset_len)]
     
-    settings = settings_complete(settings, dataset_len)
+    settings = settings_complete(settings)
 
     run(world=world, settings=settings, dataset_name=dataset_name, save_path=args.save_path)
 
