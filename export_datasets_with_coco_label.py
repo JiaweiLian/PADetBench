@@ -22,7 +22,7 @@ def run(
         vehicle_blueprint_id='vehicle.audi.etron_white',  # Blueprint ID of the vehicle
         rotate_angles = [0],  # Rotation range of the camera
         dolly_radius = [10],  # Enable dolly
-        dolly_heights = [10],  # Height of the spectator
+        dolly_heights = [5],  # Height of the spectator
         weather_deltas = [0],  # Enable weather changing
 ):
 
@@ -86,9 +86,9 @@ if __name__ == '__main__':
     if args.benchmark == 'weather' or args.benchmark == 'entire':
         run(dataset_name='weather', save_path=args.save_path, map=args.map, weather_deltas=range(0,10000,10))
     if args.benchmark == 'distance' or args.benchmark == 'entire':
-        run(dataset_name='distance', save_path=args.save_path, map=args.map, dolly_radius=range(3, 10, 1))
+        run(dataset_name='distance', save_path=args.save_path, map=args.map, dolly_radius=range(3, 20, 1))
     if args.benchmark == 'height' or args.benchmark == 'entire':
-        run(dataset_name='height', save_path=args.save_path, map=args.map, dolly_heights=range(5, 15, 1))
+        run(dataset_name='height', save_path=args.save_path, map=args.map, dolly_heights=range(3, 15, 1))
     if args.benchmark == 'rotation' or args.benchmark == 'entire':
         run(dataset_name='rotation', save_path=args.save_path, map=args.map, rotate_angles=range(0, 360, 1))
     if args.benchmark == 'random' or args.benchmark == 'entire':
