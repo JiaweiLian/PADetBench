@@ -95,7 +95,7 @@ class Camera:
         self.radius = 5.0
         self.theta = 0.0
         self.phi = 0.0
-        self.tick()
+        # self.tick()
 
         # Create a blueprint for the camera
         camera_blueprint = world.get_blueprint_library().find(sensor_blueprint_id)

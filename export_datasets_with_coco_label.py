@@ -132,6 +132,8 @@ if __name__ == '__main__':
     if args.benchmark == 'weather':
         dataset_name='weather'
         settings['weather_list'] = [i * 1 for i in range(dataset_len)]
+    
+    settings = settings_complete(settings, dataset_len)
 
     run(world=world, settings=settings, dataset_name=dataset_name, save_path=args.save_path)
 
