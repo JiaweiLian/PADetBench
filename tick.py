@@ -89,9 +89,6 @@ class Weather:
             self.storm.tick(min(delta, 10))
             delta -= 10
         self.world.set_weather(self.weather)
-        # Wait until the weather is updated
-        for _ in range(5):
-            self.world.tick()
 
         self.prev_t = curr_t
 
@@ -159,8 +156,14 @@ class Camera:
         return self.camera_blueprint.get_attribute('image_size_x'), self.camera_blueprint.get_attribute('image_size_y')
 
     def get_image(self):
+        # Wait until the image is updated
+        for _ in range(5):
+            self.world.tick()
+
+        # clear the queue
         while not self.image_queue.empty():
             self.image_queue.get()
+
         self.world.tick()
         return self.image_queue.get()
     
@@ -207,10 +210,6 @@ class Camera:
 
         # Set the new transform to the spectator
         self.base_spectator.set_transform(spectator_transform)
-        
-        # Wait until the transform is updated
-        for _ in range(5):
-            self.world.tick()
 
 class Actor:
     def __init__(self, world) -> None:
