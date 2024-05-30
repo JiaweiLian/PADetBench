@@ -197,6 +197,7 @@ class Actor:
         self.actor = None
         self.blueprint = None
         self.spawn_point = None
+        self.prev_actors = []
         
     def create_actor(self, blueprint, spawn_point):
         # Check if the blueprint and spawn point are the same
@@ -208,9 +209,13 @@ class Actor:
         # Destroy the previous actor
         if self.actor is not None:
             self.actor.destroy()
+
+        if len(self.prev_actors) > 2:
+            self.prev_actors.pop(0).destroy()
         
         # Spawn the vehicle
         self.actor = self.world.spawn_actor(blueprint, spawn_point)
+        self.prev_actors.append(self.actor)
 
         # Wait until the actor stop bouncing
         while True:
