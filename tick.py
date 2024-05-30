@@ -113,13 +113,12 @@ class Camera:
 
     def is_vehicle_in_shot(self):
         forward_vec = self.base_spectator.get_transform().get_forward_vector()
-        # ray = self.vehicle.get_transform().location - self.base_spectator.get_transform().location
-        ray = self.vehicle.get_location().get_transform().location - self.base_spectator.get_transform().location
+        ray = self.vehicle.get_transform().location - self.base_spectator.get_transform().location
+        # ray = self.vehicle.get_location().get_transform().location - self.base_spectator.get_transform().location
         return forward_vec.dot(ray) > 1
     
     def get_vertices(self):
-        # verts = [v for v in self.vehicle.bounding_box.get_world_vertices(self.vehicle.get_transform())]
-        verts = [v for v in self.vehicle.get_location().bounding_box.get_world_vertices(self.vehicle.get_transform())]
+        verts = [v for v in self.vehicle.bounding_box.get_world_vertices(self.vehicle.get_transform())]
 
         # p1 = get_image_point(npc.bounding_box.location, self.camera.K, world_2_camera)
         return verts

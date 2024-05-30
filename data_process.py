@@ -48,7 +48,6 @@ def get_2d_bb(verts, K, world_2_camera):
 class DatasetGenerator:
     def __init__(self, world, camera: Camera, save_path: str, dataset_name: str) -> None:
         self.world = world
-        self.spectator = spectator
         self.camera = camera
 
         self.annotation_id = 1
