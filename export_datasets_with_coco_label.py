@@ -103,7 +103,7 @@ def settings_complete(settings, grid=True):
     if 'phi_list' not in settings:
         settings['phi_list'] = [0]
     if 'radius_list' not in settings:
-        settings['radius_list'] = [5]
+        settings['radius_list'] = [7]
     if 'weather_list' not in settings:
         settings['weather_list'] = [1000]
 
