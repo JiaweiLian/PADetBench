@@ -38,9 +38,7 @@ def run(
     
     iteration_len = len(settings['theta_list'])
     for i in range(iteration_len):
-
         vehicle.create_actor(settings['blueprint_list'][i], settings['spawnpoint_list'][i])
-
         camera.follow(vehicle)
         camera.rotate(settings['theta_list'][i], settings['phi_list'][i])
         camera.dolly(settings['radius_list'][i])
@@ -51,7 +49,7 @@ def run(
 
         # Save the data in the pascal voc format
         # datasetGenerator.save_data(save_images=True, save_pascal_voc=True, save_images_with_2d_bb=True, save_images_with_3d_bb=True)
-        datasetGenerator.save_data(save_images=True)
+        datasetGenerator.save_data(save_images=False)
 
         if keyboard.is_pressed('q'):  
             print('You pressed q, loop will break')
@@ -108,7 +106,7 @@ if __name__ == '__main__':
     world = world_init(args.map)    
 
     # default settings
-    default_dataset_len = 100
+    default_dataset_len = 360
     settings = dict()
 
     # benchmark settings
@@ -134,6 +132,7 @@ if __name__ == '__main__':
         settings['radius_list'] = [i/dataset_len * 10 + 4 for i in range(dataset_len)]
     if args.benchmark == 'weather':
         dataset_name='weather'
+        dataset_len = default_dataset_len
         settings['weather_list'] = [i * 1 for i in range(dataset_len)]
     
     settings = settings_complete(settings, dataset_len)

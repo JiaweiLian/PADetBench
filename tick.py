@@ -71,7 +71,10 @@ class Weather:
         self.sun.tick(delta)
         self.storm.tick(delta)
         self.world.set_weather(self.weather)
-        
+        # Wait until the weather is updated
+        for _ in range(5):
+            self.world.tick()
+
         self.prev_t = curr_t
 
     def __str__(self):
@@ -188,8 +191,9 @@ class Camera:
         self.base_spectator.set_transform(spectator_transform)
         
         # Wait until the transform is updated
-        while prev_transform == self.get_transform():
+        for _ in range(5):
             self.world.tick()
+            # print(self.get_transform())
 
 class Actor:
     def __init__(self, world) -> None:
@@ -207,11 +211,8 @@ class Actor:
         self.spawn_point = spawn_point
         
         # Destroy the previous actor
-        # if self.base_actor is not None:
-        #     self.base_actor.destroy()
-
-        if len(self.prev_actors) > 2:
-            self.prev_actors.pop(0).destroy()
+        if self.base_actor is not None:
+            self.base_actor.destroy()
         
         # Spawn the vehicle
         self.base_actor = self.world.spawn_actor(blueprint, spawn_point)
