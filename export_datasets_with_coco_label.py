@@ -193,7 +193,7 @@ if __name__ == '__main__':
 
     if args.benchmark == 'weather':
         dataset_name='weather'
-        settings['weather_list'] = [i/default_dataset_len * 1000 for i in range(default_dataset_len)]
+        settings['weather_list'] = [i/default_dataset_len * 1000 for i in range(1, default_dataset_len)]
     
     if args.benchmark == 'entire':
         dataset_name='entire'
@@ -206,11 +206,10 @@ if __name__ == '__main__':
         settings['theta_list'] = [i/theta_len * (math.pi / 2) for i in range(1, theta_len)] # without theta = 0, i.e., no overhead view
         settings['phi_list'] = [i/phi_len * (2 * math.pi) for i in range(phi_len)]
         settings['radius_list'] = [i/distance_len * 10 + 4 for i in range(distance_len)]
-        settings['weather_list'] = [i/weather_len * 1000 for i in range(weather_len)]
+        settings['weather_list'] = 10*[1,6,8,10,12,21,23,25,27,29]
 
     settings = settings_complete(blueprint_list, settings)
 
     run(world=world, settings=settings, dataset_name=dataset_name, save_path=args.save_path)
 
     world_close(world)
-    

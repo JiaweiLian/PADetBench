@@ -123,7 +123,7 @@ class DatasetGenerator:
                     'category_id': self.coco_categories['car'], 
                     'id': self.annotation_id, 
                     'ignore': 0, 
-                    'segmentation': []
+                    "segmentation": {"counts": [1,2,3],"size": [600,800]}
                     }
         self.coco_label_json['annotations'].append(annotation)
         self.annotation_id += 1
