@@ -120,7 +120,7 @@ def settings_complete(blueprint_list, settings, grid=True):
 
 def get_blueprint_list(world, actor_type='vehicle', adv_type='clean'):
     example_types = dict()
-    example_types['vehicle'] = ['audi.etron', 'mercedes.coupe_2020', 'bmw.grandtourer', 'chevrolet.impala', 'jeep.wrangler_rubicon', 'mini.cooper_s', 'nissan.patrol_2021', 'tesla.model3', 'mercedes.sprinter', 'lincoln.mkz_2020']
+    example_types['vehicle'] = ['audi.etron', 'tesla.model3', 'nissan.patrol_2021', 'mercedes.coupe_2020', 'bmw.grandtourer', 'chevrolet.impala', 'jeep.wrangler_rubicon', 'mini.cooper_s_2021', 'mercedes.sprinter', 'lincoln.mkz_2020']
     world_blueprint_list = world.get_blueprint_library().filter(actor_type+'.*')
     
     # filter the example types in the blueprint list
