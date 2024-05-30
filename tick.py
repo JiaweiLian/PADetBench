@@ -65,7 +65,7 @@ class Weather:
         self.sun = Sun(self.weather)
         self.storm = Storm(self.weather)
 
-    def tick(self, delta):
+    def tick(self, delta=10.0):
         self.sun.tick(delta)
         self.storm.tick(delta)
         self.world.set_weather(self.weather)
@@ -83,11 +83,11 @@ def build_projection_matrix(w, h, fov):
 
 # Define a function that calculates the transform of the spectator
 class Camera:
-    def __init__(self, world, vehicle, radius:int, height:int, sensor_blueprint_id='sensor.camera.rgb', image_width='800', image_height='600'):
+    def __init__(self, world, vehicle, sensor_blueprint_id='sensor.camera.rgb', image_width='800', image_height='600'):
         self.base_spectator = world.get_spectator()
         self.vehicle = vehicle
-        self.radius = radius
-        self.height = height
+        self.radius = 0.0
+        self.height = 0.0
         self.angle_degree = 0.0
         self.tick(0.0)
 
@@ -137,10 +137,19 @@ class Camera:
     def get_image(self):
         return self.image_queue.get()
 
-    def tick(self, speed_rotation_degree):
-        # Update the angle of the spectator
-        self.angle_degree += speed_rotation_degree
+    def rotate(self, angle_degree):
+        self.angle_degree = angle_degree
+        self.tick()
 
+    def dolly(self, radius):
+        self.radius = radius
+        self.tick()
+
+    def height(self, height):
+        self.height = height
+        self.tick()
+
+    def tick(self):
         # Get the location of the vehicle
         vehicle_location = self.vehicle.get_location()
 
