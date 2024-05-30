@@ -145,7 +145,7 @@ class Camera:
     
     def follow(self, actor):
         actor_location = actor.get_location()
-        if self.actor_location == actor_location:
+        if actor_location is not None and self.actor_location == actor_location:
             return
         self.actor_location = actor_location
         self.tick()
