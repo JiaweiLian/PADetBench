@@ -81,7 +81,7 @@ class DatasetGenerator:
         if not os.path.exists(save_path):
             os.makedirs(save_path)
 
-        self.save_path = os.path.join(save_path, dataset_name.replace('.', '_'))
+        # self.save_path = os.path.join(save_path, dataset_name.replace('.', '_'))
         if not os.path.exists(self.save_path):
             os.makedirs(self.save_path)
         self.writer = Writer(self.save_path, self.image_w, self.image_h)
