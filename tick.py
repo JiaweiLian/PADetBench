@@ -71,6 +71,9 @@ class Weather:
         self.sun.tick(delta)
         self.storm.tick(delta)
         self.world.set_weather(self.weather)
+        while self.world.get_weather() == self.weather:
+            self.world.tick()
+
         
         self.prev_t = curr_t
 
@@ -188,7 +191,8 @@ class Camera:
         # Set the new transform to the spectator
         self.base_spectator.set_transform(spectator_transform)
         
-        while prev_transform != self.get_transform():
+        # Wait until the transform is updated
+        while prev_transform == self.get_transform():
             self.world.tick()
 
 class Actor:
@@ -212,7 +216,7 @@ class Actor:
         # Spawn the vehicle
         self.actor = self.world.spawn_actor(blueprint, spawn_point)
 
-        # Wait until the actor is spawned
+        # Wait until the actor stop bouncing
         while True:
             prev_location = self.get_location()
             self.world.tick()
