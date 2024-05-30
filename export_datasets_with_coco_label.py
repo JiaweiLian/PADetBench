@@ -110,7 +110,7 @@ if __name__ == '__main__':
     # benchmark settings
     if args.benchmark == 'vehicle':
         dataset_name='vehicle'
-        settings['blueprint_list'] = world.get_blueprint_library().filter('vehicle.*')
+        settings['blueprint_list'] = world.get_blueprint_library().filter('vehicle.*').filter('^motorcycle*')
         dataset_len = len(settings['blueprint_list'])
     if args.benchmark == 'rotation-theta':
         dataset_name='rotation-theta'
