@@ -93,8 +93,8 @@ class Camera:
         self.base_spectator = world.get_spectator()
         self.vehicle = vehicle
         self.radius = 5.0
-        self.height = 0.0
         self.theta = 0.0
+        self.phi = 0.0
         self.tick()
 
         # Create a blueprint for the camera
