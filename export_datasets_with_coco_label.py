@@ -20,11 +20,7 @@ def run(
         spawn_point=0,  # Index of the spawn point: 0-154 (Town10HD_Opt)
         speed_rotation_degree = 1.0,  # Define the speed of the rotation (degree)
         vehicle_blueprint_id='vehicle.audi.etron_white',  # Blueprint ID of the vehicle
-        output_dir = r'data',  # Define the output directory
-        save_images_with_bb = False,  # Define if the images with bounding box should be saved
-        save_images_with_2d_bb = True,  # Define if the images with 2D bounding box should be saved
-        save_images_with_3d_bb = True,  # Define if the images with 3D bounding box should be saved
-        save_pascal_voc = False,  # Define if the pascal voc format should be saved
+        save_path = r'data',  # Define the output directory
         speed_weather_changing = 10.0,  # Define the speed of the weather changing
         total_rotation_degree = math.inf  # Define the total rotation degree
 ):
@@ -63,10 +59,10 @@ def run(
     weather = Weather(world)
 
     # Name the output directory with the rotation speed and the weather speed
-    folder_name = 'output' + '_rs%02.2f' % speed_rotation_degree + '_ws%02.2f' % speed_weather_changing + "_" + vehicle_blueprint_id.split('.')[-1]
+    dataset_name = 'output' + '_rs%02.2f' % speed_rotation_degree + '_ws%02.2f' % speed_weather_changing + "_" + vehicle_blueprint_id.split('.')[-1]
 
     # Create the dataset generator
-    datasetGenerator = DatasetGenerator(world, spectator, output_dir, folder_name)
+    datasetGenerator = DatasetGenerator(world, spectator, save_path, dataset_name)
 
     # time.sleep(3)  # Wait for the car landing before taking the first image
 
@@ -76,18 +72,18 @@ def run(
 
         # Update the weather
         weather.tick(speed_weather_changing)
+        
         sys.stdout.write('\r' + str(weather) + 12 * ' ')
         sys.stdout.flush()
 
         world.tick()
 
         # Save the data in the pascal voc format
-        datasetGenerator.save_data(save_images=True)
+        datasetGenerator.save_data(save_images=False)
 
         if keyboard.is_pressed('q'):  
             print('You pressed q, loop will break')
             break  # exit loop
-    
     
     datasetGenerator.annotation_save()
 
