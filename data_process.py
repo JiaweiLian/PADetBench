@@ -86,7 +86,7 @@ class DatasetGenerator:
             os.makedirs(self.save_path)
         self.writer = Writer(self.save_path, self.image_w, self.image_h)
 
-    def data_save(self, save_images = True, save_pascal_voc = False, save_images_with_2d_bb = False, save_images_with_3d_bb = False):
+    def save_data(self, save_images = True, save_pascal_voc = False, save_images_with_2d_bb = False, save_images_with_3d_bb = False):
 
         image = self.image_queue.get()
         img = np.reshape(np.copy(image.raw_data), (image.height, image.width, 4))
