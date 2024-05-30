@@ -1,3 +1,4 @@
+from re import A
 import carla
 import math
 import argparse
@@ -136,19 +137,19 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--save_path', type=str, default='data', help='Name of the output directory')
     parser.add_argument('--map', type=str, default='Town10HD_Opt', help='Name of the map')
-    parser.add_argument('--benchmark', type=str, choices=['vehicle', 'weather', 'distance', 'rotation-theta', 'rotation-phi', 'sphere', 'spot', 'entire'], default='entire', help='Name of the benchmark')
     parser.add_argument('--actor-type', type=str, default='vehicle', help='Name of the dataset')
     parser.add_argument('--adv-type', type=str, default='clean', help='Name of the dataset')
+    parser.add_argument('--benchmark', type=str, choices=['vehicle', 'weather', 'distance', 'rotation-theta', 'rotation-phi', 'sphere', 'spot', 'entire'], default='entire', help='Name of the benchmark')
     args = parser.parse_args()
 
     world = world_init(args.map)    
 
     # default settings
+    dataset_name = args.actor_type + '_' + args.adv_type + '_' + args.benchmark
     blueprint_list = get_blueprint_list(world, actor_type=args.actor_type, adv_type=args.adv_type)
     default_dataset_len = 100
-    settings = dict()
-
     distance_range = (5,15)
+    settings = dict()
 
     # benchmark settings
     if args.benchmark == 'vehicle':
