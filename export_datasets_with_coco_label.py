@@ -102,16 +102,17 @@ if __name__ == '__main__':
 
     if args.benchmark == 'rotation-theta':
         dataset_name='rotation-theta'
-        theta_list = range(-math.pi/2, math.pi/2, math.pi/dataset_len)
+        theta_list = [i/dataset_len * math.pi - math.pi/2 for i in range(dataset_len)]
     if args.benchmark == 'rotation-phi':
         dataset_name='rotation-phi'
-        phi_list = range(0, 2*math.pi, 2*math.pi/dataset_len)
+        phi_list = [i/dataset_len * (2 * math.pi) for i in range(dataset_len)]
+        range(0, 2*math.pi, 2*math.pi/dataset_len)
     if args.benchmark == 'distance':
         dataset_name='distance'
-        radius_list = range(1, 50, 50/dataset_len)
+        radius_list = [i/dataset_len * 50 + 1 for i in range(dataset_len)]
     if args.benchmark == 'weather':
         dataset_name='weather'
-        weather_list = range(0, 10000, 10000/dataset_len)
+        weather_list = [i * 1 for i in range(dataset_len)]
     if args.benchmark == 'random':
         len = 10000
         rotate_angles = [random.randint(0, 360) for _ in range(len)]
