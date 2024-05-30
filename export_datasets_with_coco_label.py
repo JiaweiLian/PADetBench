@@ -134,10 +134,10 @@ if __name__ == '__main__':
     # benchmark settings
     if args.benchmark == 'vehicle':
         dataset_name='vehicle'
-        theta_len = 3
+        theta_len = 2
         phi_len = 4
         settings['blueprint_list'] = [blueprint for blueprint in world.get_blueprint_library().filter('vehicle.*')]
-        settings['theta_list'] = [i/theta_len * (math.pi / 2) for i in range(theta_len)]
+        settings['theta_list'] = [i/theta_len * (math.pi / 2) for i in range(1, theta_len + 1)] # without theta = 0, i.e., no overhead view
         settings['phi_list'] = [i/phi_len * (2 * math.pi) for i in range(phi_len)]
 
     if args.benchmark == 'spot':
