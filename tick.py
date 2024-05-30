@@ -55,14 +55,16 @@ class Storm:
         return 'Storm(clouds=%d%%, precipitation=%d%%, wind=%d%%)' % (self.weather.cloudiness, self.weather.precipitation, self.weather.wind_intensity)
     
 class Weather:
-    def __init__(self, weather):
-        self.weather = weather
-        self.sun = Sun(weather)
-        self.storm = Storm(weather)
+    def __init__(self, world):
+        self.world = world
+        self.weather = world.get_weather()
+        self.sun = Sun(self.weather)
+        self.storm = Storm(self.weather)
 
     def tick(self, delta):
         self.sun.tick(delta)
         self.storm.tick(delta)
+        self.world.set_weather(self.weather)
 
     def __str__(self):
         return '%s %s' % (self.sun, self.storm)
@@ -78,8 +80,8 @@ class Spectator:
 
     def tick(self, speed_rotation_degree):
         # Update the angle of the spectator
-        angle_degree += speed_rotation_degree
-        angle_radian = (math.pi * 2.0 / 360.0) * angle_degree
+        self.angle_degree += speed_rotation_degree
+        angle_radian = (math.pi * 2.0 / 360.0) * self.angle_degree
 
         # Get the location of the vehicle
         vehicle_location = self.vehicle.get_location()

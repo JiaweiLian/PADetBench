@@ -88,7 +88,7 @@ def run(
         os.makedirs(output_dir)
 
     # weather_update_freq = 0.1 / speed_weather_changing
-    weather = Weather(world.get_weather())
+    weather = Weather(world)
 
     # Name the output directory with the rotation speed and the weather speed
     folder_name = 'output' + '_rs%02.2f' % speed_rotation_degree + '_ws%02.2f' % speed_weather_changing + "_" + vehicle_blueprint_id.split('.')[-1]
@@ -123,7 +123,6 @@ def run(
 
         # Update the weather
         weather.tick(speed_weather_changing)
-        world.set_weather(weather.weather)
         sys.stdout.write('\r' + str(weather) + 12 * ' ')
         sys.stdout.flush()
 
@@ -257,28 +256,6 @@ def get_image_point(loc, K, w2c):
         point_img[1] /= point_img[2]
 
         return point_img[0:2]
-
-# Define a function that calculates the transform of the spectator
-def rotation_transform_update(vehicle, radius, height, angle_degree):
-    angle_radian = (math.pi * 2.0 / 360.0) * angle_degree
-
-    # Get the location of the vehicle
-    vehicle_location = vehicle.get_location()
-
-    # Calculate the new location of the spectator
-    location = carla.Location()
-    location.x = vehicle_location.x + radius * math.cos(angle_radian)  # X-coordinate
-    location.y = vehicle_location.y + radius * math.sin(angle_radian)  # Y-coordinate
-    location.z = vehicle_location.z + height                    # Z-coordinate
-
-    # Calculate the rotation that makes the spectator look at the vehicle
-    rotation = carla.Rotation()
-    rotation.yaw = math.degrees(angle_radian) + 180 # Yaw angle_radian
-    rotation.pitch = -math.degrees(math.atan(height / radius))  # Pitch angle_radian
-
-    # Create a new transform with the new location and the new rotation
-    transform = carla.Transform(location, rotation)
-    return transform
 
 # Define a function to save images
 def save_image(image, output_path, angle_degree):
