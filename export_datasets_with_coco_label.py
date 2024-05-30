@@ -57,7 +57,12 @@ def run(
         sys.stdout.write('\r' + str(weather) + 12 * ' ')
         sys.stdout.flush()
 
+        camera_transform_before_tick = camera.get_transform()
+
         world.tick()
+        while camera_transform_before_tick == camera.get_transform():
+            time.sleep(0.0001)
+
 
         # Save the data in the pascal voc format
         # datasetGenerator.save_data(save_images=True, save_pascal_voc=True, save_images_with_2d_bb=True, save_images_with_3d_bb=True)
@@ -84,14 +89,14 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
+    if args.benchmark == 'rotation' or args.benchmark == 'entire':
+        run(dataset_name='rotation', save_path=args.save_path, map=args.map, rotate_angles=range(0, 360, 1))
     if args.benchmark == 'weather' or args.benchmark == 'entire':
         run(dataset_name='weather', save_path=args.save_path, map=args.map, weather_deltas=range(0,10000,10))
     if args.benchmark == 'distance' or args.benchmark == 'entire':
         run(dataset_name='distance', save_path=args.save_path, map=args.map, dolly_radius=range(3, 20, 1))
     if args.benchmark == 'height' or args.benchmark == 'entire':
         run(dataset_name='height', save_path=args.save_path, map=args.map, dolly_heights=range(3, 15, 1))
-    if args.benchmark == 'rotation' or args.benchmark == 'entire':
-        run(dataset_name='rotation', save_path=args.save_path, map=args.map, rotate_angles=range(0, 360, 1))
     if args.benchmark == 'random' or args.benchmark == 'entire':
         len = 10000
         rotate_angles = [random.randint(0, 360) for _ in range(len)]

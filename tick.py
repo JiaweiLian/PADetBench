@@ -84,6 +84,7 @@ def build_projection_matrix(w, h, fov):
 # Define a function that calculates the transform of the spectator
 class Camera:
     def __init__(self, world, vehicle, sensor_blueprint_id='sensor.camera.rgb', image_width='800', image_height='600'):
+        self.world = world
         self.base_spectator = world.get_spectator()
         self.vehicle = vehicle
         self.radius = 5.0
@@ -135,7 +136,9 @@ class Camera:
         return self.camera_blueprint.get_attribute('image_size_x'), self.camera_blueprint.get_attribute('image_size_y')
 
     def get_image(self):
-        print(self.image_queue.qsize())
+        while not self.image_queue.empty():
+            self.image_queue.get()
+        self.world.tick()
         return self.image_queue.get()
 
     def rotate(self, angle_degree):
