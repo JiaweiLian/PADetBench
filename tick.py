@@ -122,7 +122,6 @@ class Camera:
     def is_in_view(self):
         forward_vec = self.base_spectator.get_transform().get_forward_vector()
         ray = self.vehicle.get_transform().location - self.base_spectator.get_transform().location
-        # ray = self.vehicle.get_location().get_transform().location - self.base_spectator.get_transform().location
         return forward_vec.dot(ray) > 1
     
     def get_vertices(self):
@@ -143,6 +142,13 @@ class Camera:
             self.image_queue.get()
         self.world.tick()
         return self.image_queue.get()
+    
+    def follow(self, actor):
+        actor_location = actor.get_location()
+        if self.actor_location == actor_location:
+            return
+        self.actor_location = actor_location
+        self.tick()
 
     def rotate(self, theta, phi):
         if self.theta == theta and self.phi == phi:
@@ -159,14 +165,11 @@ class Camera:
 
     def tick(self):
 
-        # Get the location of the vehicle
-        vehicle_location = self.vehicle.get_location()
-
         # Calculate the new location of the spectator
         location = carla.Location()
-        location.x = vehicle_location.x + self.radius * math.sin(self.theta) * math.cos(self.phi)
-        location.y = vehicle_location.y + self.radius * math.sin(self.theta) * math.sin(self.phi)
-        location.z = vehicle_location.z + self.radius * math.cos(self.theta)
+        location.x = self.actor_location.x + self.radius * math.sin(self.theta) * math.cos(self.phi)
+        location.y = self.actor_location.y + self.radius * math.sin(self.theta) * math.sin(self.phi)
+        location.z = self.actor_location.z + self.radius * math.cos(self.theta)
 
         # Calculate the rotation that makes the spectator look at the vehicle
         rotation = carla.Rotation()

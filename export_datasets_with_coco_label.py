@@ -1,4 +1,5 @@
 from ast import arg
+from calendar import c
 
 from traitlets import default
 import carla
@@ -38,6 +39,7 @@ def run(
     iteration_len = len(settings['theta_list'])
     for i in range(iteration_len):
         vehicle.create_actor(settings['blueprint_list'][i], settings['spawnpoint_list'][i])
+        camera.follow(vehicle)
         camera.rotate(settings['theta_list'][i], settings['phi_list'][i])
         camera.dolly(settings['radius_list'][i])
         weather.tick(settings['weather_list'][i])
