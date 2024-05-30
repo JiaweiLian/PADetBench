@@ -196,8 +196,8 @@ if __name__ == '__main__':
         weather_len = 10
         distance_len = 5
         settings['blueprint_list'] = blueprint_list[:3]
-        settings['weather_list'] = [40,60,80,100,150,180,200,220,250,280]
         settings['spawnpoint_list'] = world.get_map().get_spawn_points()[:3]
+        settings['weather_list'] = [40,60,80,100,150,180,200,220,250,280]
         settings['theta_list'] = [i/theta_len * (math.pi / 2) for i in range(1, theta_len)] # without theta = 0, i.e., no overhead view
         settings['phi_list'] = [i/phi_len * (2 * math.pi) for i in range(phi_len)]
         settings['radius_list'] = [rescale(i/distance_len, *distance_range) for i in range(distance_len)]

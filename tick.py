@@ -79,6 +79,9 @@ class Weather:
 
     def tick(self, curr_t):
         delta = curr_t - self.prev_t
+        if delta == 0:
+            return
+
         if delta < 0:
             self.sun.reset()
             self.storm.reset()
@@ -182,6 +185,9 @@ class Camera:
         self.tick()
 
     def tick(self):
+
+        if self.actor_location == self.actor.get_location():
+            return
 
         self.actor_location = self.actor.get_location()
 
