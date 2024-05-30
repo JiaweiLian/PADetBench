@@ -1,5 +1,6 @@
 from ast import arg
 from calendar import c
+import dis
 from re import T
 
 from traitlets import default
@@ -104,11 +105,12 @@ def settings_complete(blueprint_list, settings, grid=True):
     if 'radius_list' not in settings:
         settings['radius_list'] = [7]
     if 'weather_list' not in settings:
+        # weather_delta = 1000 represents sunny weather
         settings['weather_list'] = [1000]
 
     if grid:
         # repeat the settings to match the dataset length
-        dataset_len = repeat_setting(settings, iter(settings))    
+        dataset_len = repeat_setting(settings, iter(settings))
         
         # tile the settings to match the dataset length
         for key in settings:
@@ -118,7 +120,7 @@ def settings_complete(blueprint_list, settings, grid=True):
 
 def get_blueprint_list(world, actor_type='vehicle', adv_type='clean'):
     example_types = dict()
-    example_types['vehicle'] = ['audi.etron', 'bmw.grandtourer', 'chevrolet.impala', 'jeep.wrangler_rubicon', 'mini.cooper_s', 'nissan.patrol_2021', 'tesla.model3', 'mercedes.sprinter', 'mercedes.coupe_2020', 'lincoln.mkz_2020']
+    example_types['vehicle'] = ['audi.etron', 'mercedes.coupe_2020', 'bmw.grandtourer', 'chevrolet.impala', 'jeep.wrangler_rubicon', 'mini.cooper_s', 'nissan.patrol_2021', 'tesla.model3', 'mercedes.sprinter', 'lincoln.mkz_2020']
     world_blueprint_list = world.get_blueprint_library().filter(actor_type+'.*')
     
     # filter the example types in the blueprint list
@@ -142,7 +144,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--save_path', type=str, default='data', help='Name of the output directory')
     parser.add_argument('--map', type=str, default='Town10HD_Opt', help='Name of the map')
-    parser.add_argument('--benchmark', type=str, choices=['vehicle', 'weather', 'distance', 'rotation-theta', 'rotation-phi', 'sphere', 'spot', 'random'], default='entire', help='Name of the benchmark')
+    parser.add_argument('--benchmark', type=str, choices=['vehicle', 'weather', 'distance', 'rotation-theta', 'rotation-phi', 'sphere', 'spot', 'entire'], default='entire', help='Name of the benchmark')
     parser.add_argument('--actor-type', type=str, default='vehicle', help='Name of the dataset')
     parser.add_argument('--adv-type', type=str, default='clean', help='Name of the dataset')
     args = parser.parse_args()
@@ -191,8 +193,21 @@ if __name__ == '__main__':
 
     if args.benchmark == 'weather':
         dataset_name='weather'
-        settings['weather_list'] = [i * 10 for i in range(default_dataset_len)]
+        settings['weather_list'] = [i/default_dataset_len * 1000 for i in range(default_dataset_len)]
     
+    if args.benchmark == 'entire':
+        dataset_name='entire'
+        theta_len = 3
+        phi_len = 8
+        distance_len = 5
+        weather_len = 10
+        settings['blueprint_list'] = blueprint_list[:3]
+        settings['spawnpoint_list'] = world.get_map().get_spawn_points()[:3]
+        settings['theta_list'] = [i/theta_len * (math.pi / 2) for i in range(1, theta_len)] # without theta = 0, i.e., no overhead view
+        settings['phi_list'] = [i/phi_len * (2 * math.pi) for i in range(phi_len)]
+        settings['radius_list'] = [i/distance_len * 10 + 4 for i in range(distance_len)]
+        settings['weather_list'] = [i/weather_len * 1000 for i in range(weather_len)]
+
     settings = settings_complete(blueprint_list, settings)
 
     run(world=world, settings=settings, dataset_name=dataset_name, save_path=args.save_path)
