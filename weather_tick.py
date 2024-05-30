@@ -4,15 +4,16 @@ class Sun(object):
     def __init__(self, weather):
         self.weather = weather
         self._t = 0.0
+        self.azimuth = weather.sun_azimuth_angle
 
     def tick(self, delta_seconds):
         self._t += 0.008 * delta_seconds
         self._t %= 2.0 * math.pi
-        azimuth += 0.25 * delta_seconds
-        azimuth %= 360.0
+        self.azimuth += 0.25 * delta_seconds
+        self.azimuth %= 360.0
         altitude = (70 * math.sin(self._t)) - 20
 
-        self.weather.sun_azimuth_angle = azimuth
+        self.weather.sun_azimuth_angle = self.azimuth
         self.weather.sun_altitude_angle = altitude
 
     def __str__(self):
