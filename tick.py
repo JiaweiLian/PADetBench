@@ -184,8 +184,13 @@ class Actor:
     def __init__(self, world) -> None:
         self.world = world
         self.actor = None
+        self.blueprint = None
+        self.spawn_point = None
         
     def create_actor(self, blueprint, spawn_point):
+        if self.blueprint == blueprint and self.spawn_point == spawn_point:
+            return
+
         # Choose a spawn location
         # In this example, we're spawningradius of the circle the vehicle at a random location
         spawn_points = self.world.get_map().get_spawn_points()  # len(transforms) = 155 for Town10HD_Opt

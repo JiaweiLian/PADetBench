@@ -30,13 +30,12 @@ def run(
     
     # create a vehicle
     vehicle = Actor(world)
-    vehicle.create_actor(blueprint_list[0], spawnpoint_list[0])
-
-    # create a camera
-    camera = Camera(world, vehicle)
 
     # weather_update_freq = 0.1 / speed_weather_changing
     weather = Weather(world)
+
+    # create a camera
+    camera = Camera(world, vehicle)
 
     # Create the dataset generator
     datasetGenerator = DatasetGenerator(world, camera, save_path, dataset_name)
@@ -46,6 +45,7 @@ def run(
         print('The length of the lists must be the same')
         return
     for i in range(iteration_len):
+        vehicle.create_actor(blueprint_list[i], spawnpoint_list[i])
         camera.rotate(theta_list[i], phi_list[i])
         camera.dolly(radius_list[i])
         weather.tick(weather_list[i])
@@ -57,8 +57,6 @@ def run(
         while camera_transform_before_tick == camera.get_transform():
             time.sleep(0.0001)
             world.tick()
-
-
 
         # Save the data in the pascal voc format
         # datasetGenerator.save_data(save_images=True, save_pascal_voc=True, save_images_with_2d_bb=True, save_images_with_3d_bb=True)
@@ -92,41 +90,58 @@ def world_close(world):
     settings.synchronous_mode = False # Enables synchronous mode
     world.apply_settings(settings)
 
+def settings_complete(settings, dataset_len=100):
+    if 'spawnpoint_list' not in settings:
+        settings['theta_list'] = [0] * dataset_len
+    if 'blueprint_list' not in settings:
+        settings['blueprint_list'] = [world.get_blueprint_library().filter('vehicle.*')[0]] * dataset_len
+    if 'theta_list' not in settings:
+        settings['theta_list'] = [math.pi/3] * dataset_len
+    if 'phi_list' not in settings:
+        settings['phi_list'] = [0] * dataset_len
+    if 'radius_list' not in settings:
+        settings['radius_list'] = [5] * dataset_len
+    if 'weather_list' not in settings:
+        settings['weather_list'] = [100] * dataset_len
+
+    return settings
+
 if __name__ == '__main__':
     # Name the output directory with the rotation speed and the weather speed
     parser = argparse.ArgumentParser()
     parser.add_argument('--save_path', type=str, default='data', help='Name of the output directory')
     parser.add_argument('--map', type=str, default='Town10HD_Opt', help='Name of the map')
     parser.add_argument('--benchmark', type=str, choices=['entire', 'weather', 'distance', 'rotation-theta', 'rotation-phi', 'spot', 'random'], default='entire', help='Name of the benchmark')
-
     args = parser.parse_args()
 
-    world = world_init(args.map)
+    world = world_init(args.map)    
 
-    dataset_len = 100
-    spawnpoint_list = [0]
-    blueprint_list = [world.get_blueprint_library().filter('vehicle.*')[i] for i in range(1)]
-    theta_list = [math.pi/3] * dataset_len
-    phi_list = [0] * dataset_len
-    radius_list = [5] * dataset_len
-    weather_list = [100] * dataset_len
+    # default settings
+    default_dataset_len = 100
+    settings = dict()
 
+    # benchmark settings
     if args.benchmark == 'rotation-theta':
         dataset_name='rotation-theta'
-        theta_list = [i/dataset_len * (math.pi / 2) for i in range(dataset_len)]
+        dataset_len = default_dataset_len
+        settings['theta_list'] = [i/dataset_len * (math.pi / 2) for i in range(dataset_len)]
     if args.benchmark == 'rotation-phi':
         dataset_name='rotation-phi'
-        phi_list = [i/dataset_len * (2 * math.pi) for i in range(dataset_len)]
+        dataset_len = default_dataset_len
+        settings['phi_list'] = [i/dataset_len * (2 * math.pi) for i in range(dataset_len)]
     if args.benchmark == 'distance':
         dataset_name='distance'
-        radius_list = [i/dataset_len * 10 + 4 for i in range(dataset_len)]
+        dataset_len = default_dataset_len
+        settings['radius_list'] = [i/dataset_len * 10 + 4 for i in range(dataset_len)]
     if args.benchmark == 'weather':
         dataset_name='weather'
-        weather_list = [i * 1 for i in range(dataset_len)]
+        settings['weather_list'] = [i * 1 for i in range(dataset_len)]
     if args.benchmark == 'vehicle':
         dataset_name='vehicle'
-        blueprint_list = world.get_blueprint_library().filter('vehicle.*')
-    run(world=world, spawnpoint_list=spawnpoint_list, blueprint_list=blueprint_list, theta_list=theta_list, phi_list=phi_list, radius_list=radius_list, weather_list=weather_list, dataset_name=dataset_name, save_path=args.save_path)
+        settings['blueprint_list'] = world.get_blueprint_library().filter('vehicle.*')
+        dataset_len = len(settings['blueprint_list'])
+
+    run(world=world, settings=settings, dataset_name=dataset_name, save_path=args.save_path)
 
     world_close(world)
     
