@@ -114,17 +114,18 @@ if __name__ == '__main__':
     # benchmark settings
     if args.benchmark == 'vehicle':
         dataset_name='vehicle'
-        sphere_decompose_dataset_len = 3
+        theta_len = 3
+        phi_len = 4
         blueprint_list = world.get_blueprint_library().filter('vehicle.*')
-        blueprint_decompose_dataset_len = len(blueprint_list)
+        blueprint_len = len(blueprint_list)
         settings['blueprint_list'] = [blueprint for blueprint in blueprint_list]
-        settings['blueprint_list'] = np.repeat(settings['blueprint_list'], sphere_decompose_dataset_len ** 2).tolist()
+        settings['blueprint_list'] = np.repeat(settings['blueprint_list'], theta_len * phi_len).tolist()
         
-        settings['theta_list'] = [i/sphere_decompose_dataset_len * (math.pi / 2) for i in range(sphere_decompose_dataset_len)]
-        settings['theta_list'] = np.repeat(settings['theta_list'], sphere_decompose_dataset_len).tolist() * blueprint_decompose_dataset_len
+        settings['theta_list'] = [i/theta_len * (math.pi / 2) for i in range(theta_len)]
+        settings['theta_list'] = np.repeat(settings['theta_list'], phi_len).tolist() * blueprint_len
 
-        settings['phi_list'] = [i/sphere_decompose_dataset_len * (2 * math.pi) for i in range(sphere_decompose_dataset_len)]
-        settings['phi_list'] = settings['phi_list'] * sphere_decompose_dataset_len * blueprint_decompose_dataset_len
+        settings['phi_list'] = [i/phi_len * (2 * math.pi) for i in range(phi_len)]
+        settings['phi_list'] = settings['phi_list'] * theta_len * blueprint_len
         
         dataset_len = len(settings['blueprint_list'])
 
