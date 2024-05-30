@@ -103,7 +103,7 @@ if __name__ == '__main__':
 
     if args.benchmark == 'rotation-theta':
         dataset_name='rotation-theta'
-        theta_list = [i/dataset_len * math.pi - math.pi/2 for i in range(dataset_len)]
+        theta_list = [i/dataset_len * (math.pi / 2) for i in range(dataset_len)]
     if args.benchmark == 'rotation-phi':
         dataset_name='rotation-phi'
         phi_list = [i/dataset_len * (2 * math.pi) for i in range(dataset_len)]
