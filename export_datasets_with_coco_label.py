@@ -64,9 +64,10 @@ def run(
         sys.stdout.flush()
 
         camera_transform_before_tick = camera.get_transform()
-        world.tick()
         while camera_transform_before_tick == camera.get_transform():
             time.sleep(0.0001)
+            world.tick()
+
 
 
         # Save the data in the pascal voc format
