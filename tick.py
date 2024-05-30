@@ -77,6 +77,7 @@ class Spectator:
         self.radius = radius
         self.height = height
         self.angle_degree = 0.0
+        self.tick(0.0)
 
     def tick(self, speed_rotation_degree):
         # Update the angle of the spectator
