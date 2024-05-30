@@ -109,7 +109,7 @@ if __name__ == '__main__':
         phi_list = [i/dataset_len * (2 * math.pi) for i in range(dataset_len)]
     if args.benchmark == 'distance':
         dataset_name='distance'
-        radius_list = [i/dataset_len * 10 + 3.5 for i in range(dataset_len)]
+        radius_list = [i/dataset_len * 10 + 4 for i in range(dataset_len)]
     if args.benchmark == 'weather':
         dataset_name='weather'
         weather_list = [i * 1 for i in range(dataset_len)]
