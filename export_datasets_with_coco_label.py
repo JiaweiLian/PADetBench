@@ -44,7 +44,6 @@ def run(
         camera.rotate(settings['theta_list'][i], settings['phi_list'][i])
         camera.dolly(settings['radius_list'][i])
         
-        print(settings['weather_list'][i])
         weather.tick(settings['weather_list'][i])
 
         sys.stdout.write('\r' + str(weather) + 12 * ' ')
@@ -123,12 +122,16 @@ def get_blueprint_list(world, actor_type='vehicle', adv_type='clean'):
     world_blueprint_list = world.get_blueprint_library().filter(actor_type+'.*')
     
     # filter the example types in the blueprint list
+    blueprint_list = []
     for example_type in example_types[actor_type]:
         blueprint_list += [blueprint for blueprint in world_blueprint_list if blueprint.id.find(example_type)!=-1]
 
     # filter the adversarial types in the blueprint list
     if adv_type == 'clean':
         blueprint_list = [blueprint for blueprint in blueprint_list if blueprint.id.find('adv')==-1]
+        blueprint_list = [blueprint for blueprint in blueprint_list if blueprint.id.find('random')==-1]
+    elif adv_type == 'random':
+        blueprint_list = [blueprint for blueprint in blueprint_list if blueprint.id.find('random')!=-1]
     elif adv_type.find('adv') != -1:
         blueprint_list = [blueprint for blueprint in blueprint_list if blueprint.id.find(adv_type)!=-1]
     return blueprint_list

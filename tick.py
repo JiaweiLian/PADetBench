@@ -195,7 +195,6 @@ class Camera:
         # Wait until the transform is updated
         for _ in range(5):
             self.world.tick()
-            # print(self.get_transform())
 
 class Actor:
     def __init__(self, world) -> None:
