@@ -85,7 +85,7 @@ if __name__ == '__main__':
     if args.benchmark == 'weather' or args.benchmark == 'entire':
         run(dataset_name='weather', save_path=args.save_path, map=args.map, weather_deltas=range(0,10000,10))
     if args.benchmark == 'distance' or args.benchmark == 'entire':
-        run(dataset_name='distance', save_path=args.save_path, map=args.map, dolly_radius=range(1, 10, 1))
+        run(dataset_name='distance', save_path=args.save_path, map=args.map, dolly_radius=range(3, 10, 1))
     if args.benchmark == 'rotation' or args.benchmark == 'entire':
         run(dataset_name='rotation', save_path=args.save_path, map=args.map, rotate_angles=range(0, 360, 1))
     if args.benchmark == 'random' or args.benchmark == 'entire':
