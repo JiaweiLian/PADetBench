@@ -88,10 +88,11 @@ def build_projection_matrix(w, h, fov):
 
 # Define a function that calculates the transform of the spectator
 class Camera:
-    def __init__(self, world, vehicle, sensor_blueprint_id='sensor.camera.rgb', image_width='800', image_height='600'):
+    def __init__(self, world, actor, sensor_blueprint_id='sensor.camera.rgb', image_width='800', image_height='600'):
         self.world = world
         self.base_spectator = world.get_spectator()
-        self.vehicle = vehicle
+        self.actor_location = None
+        self.actor = actor
         self.radius = 5.0
         self.theta = 0.0
         self.phi = 0.0
@@ -121,11 +122,11 @@ class Camera:
 
     def is_in_view(self):
         forward_vec = self.base_spectator.get_transform().get_forward_vector()
-        ray = self.vehicle.get_transform().location - self.base_spectator.get_transform().location
+        ray = self.actor.get_transform().location - self.base_spectator.get_transform().location
         return forward_vec.dot(ray) > 1
     
     def get_vertices(self):
-        verts = [v for v in self.vehicle.get_bounding_box().get_world_vertices(self.vehicle.get_transform())]
+        verts = [v for v in self.actor.get_bounding_box().get_world_vertices(self.actor.get_transform())]
         return verts
 
     def get_transform(self):
