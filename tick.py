@@ -194,7 +194,7 @@ class Camera:
 class Actor:
     def __init__(self, world) -> None:
         self.world = world
-        self.actor = None
+        self.base_actor = None
         self.blueprint = None
         self.spawn_point = None
         self.prev_actors = []
@@ -207,15 +207,15 @@ class Actor:
         self.spawn_point = spawn_point
         
         # Destroy the previous actor
-        if self.actor is not None:
-            self.actor.destroy()
+        # if self.base_actor is not None:
+        #     self.base_actor.destroy()
 
         if len(self.prev_actors) > 2:
             self.prev_actors.pop(0).destroy()
         
         # Spawn the vehicle
-        self.actor = self.world.spawn_actor(blueprint, spawn_point)
-        self.prev_actors.append(self.actor)
+        self.base_actor = self.world.spawn_actor(blueprint, spawn_point)
+        self.prev_actors.append(self.base_actor)
 
         # Wait until the actor stop bouncing
         while True:
@@ -225,13 +225,13 @@ class Actor:
                 break
 
     def get_transform(self):
-        return self.actor.get_transform()
+        return self.base_actor.get_transform()
     
     def get_location(self):
-        return self.actor.get_location()
+        return self.base_actor.get_location()
     
     def get_bounding_box(self):
-        return self.actor.bounding_box
+        return self.base_actor.bounding_box
 
     def __del__(self):
-        self.actor.destroy()
+        self.base_actor.destroy()
