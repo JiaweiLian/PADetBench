@@ -28,23 +28,17 @@ def run(
     client = carla.Client('localhost', 2000)
     world = client.load_world(map)
 
-    # Spawn the vehicle
-    vehicle = Actor(world, vehicle_blueprint_id, spawn_point)
-
-    # # Wait for the vehicle to be ready
-    # world_tick(20, world)
-
     # Set up the simulator in synchronous mode
     settings = world.get_settings()
     settings.synchronous_mode = True # Enables synchronous mode
     settings.fixed_delta_seconds = 0.05
     world.apply_settings(settings)
 
-    # Get the spectator
-    camera = Camera(world, vehicle, radius, height)
+    # create a vehicle
+    vehicle = Actor(world, vehicle_blueprint_id, spawn_point)
 
-    # Attach the camera to the spectator
-    # The camera's transform relative to the spectator is set same as camera attach to the ego vehicle, otherwise the calculated bounding box will be inaccurate
+    # create a camera
+    camera = Camera(world, vehicle, radius, height)
 
     # weather_update_freq = 0.1 / speed_weather_changing
     weather = Weather(world)
@@ -54,8 +48,6 @@ def run(
 
     # Create the dataset generator
     datasetGenerator = DatasetGenerator(world, camera, save_path, dataset_name)
-
-    # time.sleep(3)  # Wait for the car landing before taking the first image
 
     while camera.angle_degree < total_rotation_degree:
         # Update the spectator
@@ -83,15 +75,6 @@ def run(
 
     settings.synchronous_mode = False # Enables synchronous mode
     world.apply_settings(settings)
-
-def world_tick(n, world):
-    for i in range(n):
-        world.tick()
-
-# Define a function to save images
-def save_image(image, output_path, angle_degree):
-    # Save the image to disk
-    image.save_to_disk(output_path)
 
 if __name__ == '__main__':
     run()
