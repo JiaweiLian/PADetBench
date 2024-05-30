@@ -138,7 +138,7 @@ if __name__ == '__main__':
     parser.add_argument('--save_path', type=str, default='data', help='Name of the output directory')
     parser.add_argument('--map', type=str, default='Town10HD_Opt', help='Name of the map')
     parser.add_argument('--actor-type', type=str, default='vehicle', help='Name of the dataset')
-    parser.add_argument('--adv-type', type=str, default='clean', help='Name of the dataset')
+    parser.add_argument('--adv-type', type=str, default='clean', choices=['clean', 'random', 'adv_active', 'adv_fca', 'adv_dta'], help='Name of the dataset')
     parser.add_argument('--benchmark', type=str, choices=['vehicle', 'weather', 'distance', 'rotation-theta', 'rotation-phi', 'sphere', 'spot', 'entire'], default='entire', help='Name of the benchmark')
     args = parser.parse_args()
 
