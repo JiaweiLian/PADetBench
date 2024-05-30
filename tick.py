@@ -156,7 +156,7 @@ class Camera:
         location = carla.Location()
         location.x = vehicle_location.x + self.radius * math.cos(angle_radian)  # X-coordinate
         location.y = vehicle_location.y + self.radius * math.sin(angle_radian)  # Y-coordinate
-        location.z = vehicle_location.z + self.height                    # Z-coordinate
+        location.z = vehicle_location.z + self.height                           # Z-coordinate
 
         # Calculate the rotation that makes the spectator look at the vehicle
         rotation = carla.Rotation()
