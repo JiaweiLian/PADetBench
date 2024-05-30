@@ -18,7 +18,7 @@ from data_process import DatasetGenerator
 
 def run(
         world,  # Name of the map
-        spawn_point,  # Index of the spawn point: 0-154 (Town10HD_Opt)
+        spawnpoint_list,  # Index of the spawn point: 0-154 (Town10HD_Opt)
         blueprint_list,  # Blueprint ID of the vehicle
         theta_list,  # Rotation range of the camera
         phi_list,  # Height of the spectator
@@ -29,7 +29,8 @@ def run(
 ):
     
     # create a vehicle
-    vehicle = Actor(world, blueprint_list[0], spawn_point[0])
+    vehicle = Actor(world)
+    vehicle.create_actor(blueprint_list[0], spawnpoint_list[0])
 
     # create a camera
     camera = Camera(world, vehicle)
