@@ -102,7 +102,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--save_path', type=str, default='data', help='Name of the output directory')
     parser.add_argument('--map', type=str, default='Town10HD_Opt', help='Name of the map')
-    parser.add_argument('--benchmark', type=str, choices=['vehicle', 'weather', 'distance', 'rotation-theta', 'rotation-phi', 'spot', 'random'], default='entire', help='Name of the benchmark')
+    parser.add_argument('--benchmark', type=str, choices=['vehicle', 'weather', 'distance', 'rotation-theta', 'rotation-phi', 'sphere', 'spot', 'random'], default='entire', help='Name of the benchmark')
     args = parser.parse_args()
 
     world = world_init(args.map)    
@@ -114,8 +114,19 @@ if __name__ == '__main__':
     # benchmark settings
     if args.benchmark == 'vehicle':
         dataset_name='vehicle'
-        settings['blueprint_list'] = world.get_blueprint_library().filter('vehicle.*')
-        dataset_len = len(settings['blueprint_list'])
+        sphere_decompose_dataset_len = 3
+        blueprint_list = world.get_blueprint_library().filter('vehicle.*')
+        blueprint_decompose_dataset_len = len(blueprint_list)
+        settings['blueprint_list'] = [blueprint for blueprint in blueprint_list]
+        settings['blueprint_list'] = np.repeat(settings['blueprint_list'], sphere_decompose_dataset_len ** 2).tolist()
+        
+        settings['theta_list'] = [i/sphere_decompose_dataset_len * (math.pi / 2) for i in range(sphere_decompose_dataset_len)]
+        settings['theta_list'] = np.repeat(settings['theta_list'], sphere_decompose_dataset_len).tolist() * blueprint_decompose_dataset_len
+
+        settings['phi_list'] = [i/sphere_decompose_dataset_len * (2 * math.pi) for i in range(sphere_decompose_dataset_len)]
+        settings['phi_list'] = settings['phi_list'] * sphere_decompose_dataset_len * blueprint_decompose_dataset_len
+        
+
     if args.benchmark == 'spot':
         dataset_name='spot'
         settings['spawnpoint_list'] = world.get_map().get_spawn_points()
@@ -128,6 +139,12 @@ if __name__ == '__main__':
         dataset_name='rotation-phi'
         dataset_len = default_dataset_len
         settings['phi_list'] = [i/dataset_len * (2 * math.pi) for i in range(dataset_len)]
+    if args.benchmark == 'sphere':
+        dataset_name='sphere'
+        decompose_dataset_len = int(default_dataset_len ** (1/2))
+        dataset_len = decompose_dataset_len ** 2
+        settings['theta_list'] = [i/decompose_dataset_len * (math.pi / 2) for i in range(decompose_dataset_len)] * decompose_dataset_len
+        settings['phi_list'] = np.repeat([i/decompose_dataset_len * (2 * math.pi) for i in range(decompose_dataset_len)], decompose_dataset_len).tolist()
     if args.benchmark == 'distance':
         dataset_name='distance'
         dataset_len = default_dataset_len
