@@ -1,4 +1,3 @@
-import scipy as sp
 import carla
 import random
 import math
