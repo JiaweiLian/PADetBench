@@ -118,7 +118,7 @@ def settings_complete(blueprint_list, settings, grid=True):
 
 def get_blueprint_list(world, actor_type='vehicle', adv_type='clean'):
     example_types = dict()
-    example_types['vehicle'] = ['audi.etron', 'bmw.grandtourer', 'chevrolet.impala', 'jeep.wrangler_rubicon', 'mini.cooper_s', 'nissan.patrol_2021', 'tesla.model3', 'mercedes.spinter', 'mercedes.coupe', 'lincoln.mkz_2020']
+    example_types['vehicle'] = ['audi.etron', 'bmw.grandtourer', 'chevrolet.impala', 'jeep.wrangler_rubicon', 'mini.cooper_s', 'nissan.patrol_2021', 'tesla.model3', 'mercedes.sprinter', 'mercedes.coupe_2020', 'lincoln.mkz_2020']
     world_blueprint_list = world.get_blueprint_library().filter(actor_type+'.*')
     
     # filter the example types in the blueprint list
@@ -165,8 +165,10 @@ if __name__ == '__main__':
 
     if args.benchmark == 'spot':
         dataset_name='spot'
+        theta_len = 3
+        phi_len = 8
         settings['spawnpoint_list'] = world.get_map().get_spawn_points()
-        settings['theta_list'] = [i/theta_len * (math.pi / 2) for i in range(theta_len)]
+        settings['theta_list'] = [i/theta_len * (math.pi / 2) for i in range(1, theta_len)] # without theta = 0, i.e., no overhead view
         settings['phi_list'] = [i/phi_len * (2 * math.pi) for i in range(phi_len)]
 
     if args.benchmark == 'rotation-theta':
@@ -180,7 +182,7 @@ if __name__ == '__main__':
     if args.benchmark == 'sphere':
         dataset_name='sphere'
         decompose_dataset_len = int(default_dataset_len ** (1/2))
-        settings['theta_list'] = [i/decompose_dataset_len * (math.pi / 2) for i in range(decompose_dataset_len)]
+        settings['theta_list'] = [i/decompose_dataset_len * (math.pi / 2) for i in range(1, decompose_dataset_len)] # without theta = 0, i.e., no overhead view
         settings['phi_list'] = [i/decompose_dataset_len * (2 * math.pi) for i in range(decompose_dataset_len)]
 
     if args.benchmark == 'distance':
