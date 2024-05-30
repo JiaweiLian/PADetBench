@@ -68,8 +68,10 @@ class Weather:
 
     def tick(self, curr_t):
         delta = curr_t - self.prev_t
-        self.sun.tick(delta)
-        self.storm.tick(delta)
+        while delta > 0:
+            self.sun.tick(min(delta, 10))
+            self.storm.tick(min(delta, 10))
+            delta -= 10
         self.world.set_weather(self.weather)
         # Wait until the weather is updated
         for _ in range(5):
