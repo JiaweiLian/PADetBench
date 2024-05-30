@@ -82,22 +82,22 @@ def world_close(world):
     settings.synchronous_mode = False # Enables synchronous mode
     world.apply_settings(settings)
 
-def repeat_dataset(dataset, iterator):
+def repeat_setting(dataset, iterator):
     try:
         key = next(iterator)
-        repeat_len = repeat_dataset(dataset, iterator)
+        repeat_len = repeat_setting(dataset, iterator)
         dataset[key] = np.repeat(dataset[key], repeat_len).tolist()
         return len(dataset[key])
     except StopIteration:
         return 1
 
-def settings_complete(settings, grid=True):
+def settings_complete(blueprint_list, settings, grid=True):
 
     # default settings
     if 'spawnpoint_list' not in settings:
         settings['spawnpoint_list'] = [world.get_map().get_spawn_points()[0]]
     if 'blueprint_list' not in settings:
-        settings['blueprint_list'] = [world.get_blueprint_library().filter('vehicle.*')[0]]
+        settings['blueprint_list'] = [blueprint_list.contains('vehicle.audi.etron')]
     if 'theta_list' not in settings:
         settings['theta_list'] = [math.pi/3]
     if 'phi_list' not in settings:
@@ -109,7 +109,7 @@ def settings_complete(settings, grid=True):
 
     if grid:
         # repeat the settings to match the dataset length
-        dataset_len = repeat_dataset(settings, iter(settings))    
+        dataset_len = repeat_setting(settings, iter(settings))    
         
         # tile the settings to match the dataset length
         for key in settings:
@@ -117,17 +117,36 @@ def settings_complete(settings, grid=True):
 
     return settings
 
+def get_blueprint_list(world, actor_type='vehicle', adv_type='clean'):
+    example_types = dict()
+    example_types['vehicle'] = ['audi.etron', 'bmw.grandtourer', 'chevrolet.impala', 'jeep.wrangler_rubicon', 'mini.cooper_s', 'nissan.patrol_2021', 'tesla.model3', 'mercedes.spinter', 'mercedes.coupe', 'lincoln.mkz_2020']
+    blueprint_list = world.get_blueprint_library().filter(actor_type+'.*')
+    
+    # filter the example types in the blueprint list
+    for example_type in example_types[actor_type]:
+        blueprint_list = [blueprint for blueprint in blueprint_list if blueprint.id.contains(example_type)]
+
+    if adv_type == 'clean':
+        blueprint_list = [blueprint for blueprint in blueprint_list if not blueprint.id.contains('adv')]
+    elif adv_type.contains('adv'):
+        blueprint_list = [blueprint for blueprint in blueprint_list if blueprint.id.contains(adv_type)]
+    return blueprint_list
+    
+
 if __name__ == '__main__':
     # Name the output directory with the rotation speed and the weather speed
     parser = argparse.ArgumentParser()
     parser.add_argument('--save_path', type=str, default='data', help='Name of the output directory')
     parser.add_argument('--map', type=str, default='Town10HD_Opt', help='Name of the map')
     parser.add_argument('--benchmark', type=str, choices=['vehicle', 'weather', 'distance', 'rotation-theta', 'rotation-phi', 'sphere', 'spot', 'random'], default='entire', help='Name of the benchmark')
+    parser.add_argument('--actor-type', type=str, default='vehicle', help='Name of the dataset')
+    parser.add_argument('--adv-type', type=str, default='clean', help='Name of the dataset')
     args = parser.parse_args()
 
     world = world_init(args.map)    
 
     # default settings
+    blueprint_list = get_blueprint_list(world, actor_type=args.actor_type, adv_type=args.adv_type)
     default_dataset_len = 100
     settings = dict()
 
@@ -136,7 +155,7 @@ if __name__ == '__main__':
         dataset_name='vehicle'
         theta_len = 3
         phi_len = 4
-        settings['blueprint_list'] = [blueprint for blueprint in world.get_blueprint_library().filter('vehicle.*')]
+        settings['blueprint_list'] = [blueprint for blueprint in blueprint_list]
         settings['theta_list'] = [i/theta_len * (math.pi / 2) for i in range(1, theta_len)] # without theta = 0, i.e., no overhead view
         settings['phi_list'] = [i/phi_len * (2 * math.pi) for i in range(phi_len)]
 
@@ -149,17 +168,21 @@ if __name__ == '__main__':
     if args.benchmark == 'rotation-theta':
         dataset_name='rotation-theta'
         settings['theta_list'] = [i/default_dataset_len * (math.pi / 2) for i in range(default_dataset_len)]
+
     if args.benchmark == 'rotation-phi':
         dataset_name='rotation-phi'
         settings['phi_list'] = [i/default_dataset_len * (2 * math.pi) for i in range(default_dataset_len)]
+
     if args.benchmark == 'sphere':
         dataset_name='sphere'
         decompose_dataset_len = int(default_dataset_len ** (1/2))
         settings['theta_list'] = [i/decompose_dataset_len * (math.pi / 2) for i in range(decompose_dataset_len)]
         settings['phi_list'] = [i/decompose_dataset_len * (2 * math.pi) for i in range(decompose_dataset_len)]
+
     if args.benchmark == 'distance':
         dataset_name='distance'
         settings['radius_list'] = [i/default_dataset_len * 10 + 4 for i in range(default_dataset_len)]
+
     if args.benchmark == 'weather':
         dataset_name='weather'
         settings['weather_list'] = [i * 10 for i in range(default_dataset_len)]
