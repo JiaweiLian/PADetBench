@@ -37,6 +37,7 @@ class Storm:
     def __init__(self, weather):
         self.weather = weather
         self.init_precipitation = weather.precipitation if weather.precipitation > 0.0 else -50.0
+        self.reset()
 
     def reset(self):
         self._t = self.init_precipitation
