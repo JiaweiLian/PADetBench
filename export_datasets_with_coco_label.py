@@ -153,7 +153,6 @@ if __name__ == '__main__':
 
     # benchmark settings
     if args.benchmark == 'vehicle':
-        dataset_name='vehicle'
         theta_len = 3
         phi_len = 8
         settings['blueprint_list'] = [blueprint for blueprint in blueprint_list]
@@ -161,7 +160,6 @@ if __name__ == '__main__':
         settings['phi_list'] = [i/phi_len * (2 * math.pi) for i in range(phi_len)]
 
     if args.benchmark == 'spot':
-        dataset_name='spot'
         theta_len = 3
         phi_len = 8
         settings['spawnpoint_list'] = world.get_map().get_spawn_points()
@@ -169,29 +167,23 @@ if __name__ == '__main__':
         settings['phi_list'] = [i/phi_len * (2 * math.pi) for i in range(phi_len)]
 
     if args.benchmark == 'weather':
-        dataset_name='weather'
         settings['weather_list'] = [i/default_dataset_len * 1000 for i in range(1, default_dataset_len)]
 
     if args.benchmark == 'rotation-theta':
-        dataset_name='rotation-theta'
         settings['theta_list'] = [i/default_dataset_len * (math.pi / 2) for i in range(default_dataset_len)]
 
     if args.benchmark == 'rotation-phi':
-        dataset_name='rotation-phi'
         settings['phi_list'] = [i/default_dataset_len * (2 * math.pi) for i in range(default_dataset_len)]
 
     if args.benchmark == 'sphere':
-        dataset_name='sphere'
         decompose_dataset_len = int(default_dataset_len ** (1/2))
         settings['theta_list'] = [i/decompose_dataset_len * (math.pi / 2) for i in range(1, decompose_dataset_len)] # without theta = 0, i.e., no overhead view
         settings['phi_list'] = [i/decompose_dataset_len * (2 * math.pi) for i in range(decompose_dataset_len)]
 
     if args.benchmark == 'distance':
-        dataset_name='distance'
         settings['radius_list'] = [rescale(i/default_dataset_len, *distance_range) for i in range(default_dataset_len)]
 
     if args.benchmark == 'entire':
-        dataset_name='entire'
         theta_len = 3
         phi_len = 8
         weather_len = 10
