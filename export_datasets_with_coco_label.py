@@ -42,6 +42,8 @@ def run(
         camera.follow(vehicle)
         camera.rotate(settings['theta_list'][i], settings['phi_list'][i])
         camera.dolly(settings['radius_list'][i])
+        
+        print(settings['weather_list'][i])
         weather.tick(settings['weather_list'][i])
 
         sys.stdout.write('\r' + str(weather) + 12 * ' ')
@@ -49,7 +51,7 @@ def run(
 
         # Save the data in the pascal voc format
         # datasetGenerator.save_data(save_images=True, save_pascal_voc=True, save_images_with_2d_bb=True, save_images_with_3d_bb=True)
-        datasetGenerator.save_data(save_images=False)
+        datasetGenerator.save_data(save_images=True)
 
         if keyboard.is_pressed('q'):  
             print('You pressed q, loop will break')
@@ -91,7 +93,7 @@ def settings_complete(settings, dataset_len=100):
     if 'radius_list' not in settings:
         settings['radius_list'] = [5] * dataset_len
     if 'weather_list' not in settings:
-        settings['weather_list'] = [100] * dataset_len
+        settings['weather_list'] = [1000] * dataset_len
 
     return settings
 
@@ -106,7 +108,7 @@ if __name__ == '__main__':
     world = world_init(args.map)    
 
     # default settings
-    default_dataset_len = 360
+    default_dataset_len = 100
     settings = dict()
 
     # benchmark settings
@@ -133,7 +135,7 @@ if __name__ == '__main__':
     if args.benchmark == 'weather':
         dataset_name='weather'
         dataset_len = default_dataset_len
-        settings['weather_list'] = [i * 1 for i in range(dataset_len)]
+        settings['weather_list'] = [i * 10 for i in range(dataset_len)]
     
     settings = settings_complete(settings, dataset_len)
 
