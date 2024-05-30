@@ -143,6 +143,7 @@ class Camera:
 
     def dolly(self, radius, height):
         self.radius = radius
+        self.height = height
         self.tick()
 
     def tick(self):
