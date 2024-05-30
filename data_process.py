@@ -106,7 +106,7 @@ class DatasetGenerator:
         # Add the object to the frame (ensure it is inside the image)
         # weather_string = str(weather).replace(' ', '_').replace(':', '').replace(',', '').replace('(', '_').replace(')', '').replace('=', '').replace('%', '').replace('.', '_')
         # image_id = '%06d' % angle_degree + '_R%02d' % radius + '_H%02d_' % height + weather_string + '_' + map  # Detailed information of the image
-        image_id = '%06d' % self.camera.angle_degree
+        image_id = f'{self.annotation_id:06d}'
         image_name = image_id + '.png'
 
         image_json = {'file_name': image_name, 'height': image.height, 'width': image.width, 'id': int(image_id)}
