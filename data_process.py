@@ -152,5 +152,5 @@ class DatasetGenerator:
             os.makedirs(os.path.join(self.save_path, 'annotations'))
 
         # Save the json file with the annotations
-        with open(os.path.join(self.save_path, 'annotations', 'captions_val2017.json'), 'w') as f:
+        with open(os.path.join(self.save_path, 'annotations', 'instances_val2017.json'), 'w') as f:
             json.dump(self.coco_label_json, f)
