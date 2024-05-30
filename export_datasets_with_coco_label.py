@@ -38,7 +38,17 @@ def run(
     
     iteration_len = len(settings['theta_list'])
     for i in range(iteration_len):
+        world_settings = world.get_settings()
+        world_settings.synchronous_mode = False # Enables synchronous mode
+        world.apply_settings(settings)
+
+        
         vehicle.create_actor(settings['blueprint_list'][i], settings['spawnpoint_list'][i])
+        world_settings = world.get_settings()
+        world_settings.synchronous_mode = True # Enables synchronous mode
+        world.apply_settings(settings)
+
+
         camera.follow(vehicle)
         camera.rotate(settings['theta_list'][i], settings['phi_list'][i])
         camera.dolly(settings['radius_list'][i])

@@ -71,12 +71,8 @@ class Weather:
         self.sun.tick(delta)
         self.storm.tick(delta)
         self.world.set_weather(self.weather)
-        while self.world.get_weather() == self.weather:
-            self.world.tick()
-
         
         self.prev_t = curr_t
-
 
     def __str__(self):
         return '%s %s' % (self.sun, self.storm)
