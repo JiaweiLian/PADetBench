@@ -1,5 +1,8 @@
 import math
 
+def clamp(value, minimum=0.0, maximum=100.0):
+    return max(minimum, min(value, maximum))
+
 class Sun(object):
     def __init__(self, weather):
         self.weather = weather
@@ -61,4 +64,4 @@ class Weather:
         self.storm.tick(delta_seconds)
 
     def __str__(self):
-        return '%s %s' % (self._sun, self._storm)
+        return '%s %s' % (self.sun, self.storm)

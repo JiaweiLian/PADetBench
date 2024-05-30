@@ -17,8 +17,8 @@ from weather_tick import Weather
 
 def run(
         map='Town10HD_Opt',  # Name of the map
-        radius=10,  # Radius of the spectator rotation circle
-        height=5,  # Height of the spectator
+        radius=6,  # Radius of the spectator rotation circle
+        height=3,  # Height of the spectator
         spawn_point=0,  # Index of the spawn point: 0-154 (Town10HD_Opt)
         speed_rotation_degree = 1.0,  # Define the speed of the rotation (degree)
         vehicle_blueprint_id='vehicle.audi.etron_white',  # Blueprint ID of the vehicle
@@ -276,13 +276,13 @@ def rotation_transform_update(vehicle, radius, height, angle_radian):
 
     # Calculate the new location of the spectator
     location = carla.Location()
-    location.x = vehicle_location.x - radius * math.cos(angle_radian)  # X-coordinate
+    location.x = vehicle_location.x + radius * math.cos(angle_radian)  # X-coordinate
     location.y = vehicle_location.y + radius * math.sin(angle_radian)  # Y-coordinate
     location.z = vehicle_location.z + height                    # Z-coordinate
 
     # Calculate the rotation that makes the spectator look at the vehicle
     rotation = carla.Rotation()
-    rotation.yaw = -math.degrees(angle_radian)  # Yaw angle_radian
+    rotation.yaw = math.degrees(angle_radian) + 180 # Yaw angle_radian
     rotation.pitch = -math.degrees(math.atan(height / radius))  # Pitch angle_radian
 
     # Create a new transform with the new location and the new rotation
@@ -293,9 +293,6 @@ def rotation_transform_update(vehicle, radius, height, angle_radian):
 def save_image(image, output_path, angle_degree):
     # Save the image to disk
     image.save_to_disk(output_path)
-
-def clamp(value, minimum=0.0, maximum=100.0):
-    return max(minimum, min(value, maximum))
 
 if __name__ == '__main__':
     run()
