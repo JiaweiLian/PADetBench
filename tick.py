@@ -172,7 +172,7 @@ class Camera:
         # Calculate the rotation that makes the spectator look at the vehicle
         rotation = carla.Rotation()
         rotation.yaw = math.degrees(self.phi) + 180 # Yaw angle_radian
-        rotation.pitch = -math.degrees(self.theta)  # Pitch angle_radian
+        rotation.pitch = -math.degrees(math.pi/2 - self.theta)  # Pitch angle_radian
 
         # Create a new transform with the new location and the new rotation
         spectator_transform = carla.Transform(location, rotation)
