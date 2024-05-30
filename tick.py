@@ -170,7 +170,7 @@ class Camera:
         # Set the new transform to the spectator
         self.base_spectator.set_transform(spectator_transform)
         
-        time.sleep(1)
+        time.sleep(0.1)
 
 class Actor:
     def __init__(self, world, blueprint_id, spawn_point) -> None:

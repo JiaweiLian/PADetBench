@@ -22,7 +22,7 @@ def run(
         rotate_angles = [0],  # Rotation range of the camera
         dolly_radius = [10],  # Enable dolly
         dolly_heights = [5],  # Height of the spectator
-        weather_deltas = range(0,1000,10),  # Enable weather changing
+        weather_deltas = [0],  # Enable weather changing
 ):
 
     # Connect to the client and retrieve the world object
