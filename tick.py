@@ -13,8 +13,12 @@ def clamp(value, minimum=0.0, maximum=100.0):
 class Sun(object):
     def __init__(self, weather):
         self.weather = weather
+        self.init_sun_azimuth_angle = weather.sun_azimuth_angle
+        self.reset()
+    
+    def reset(self):
         self._t = 0.0
-        self.azimuth = weather.sun_azimuth_angle
+        self.azimuth = self.init_sun_azimuth_angle
 
     def tick(self, delta):
         self._t += 0.008 * delta
@@ -32,7 +36,10 @@ class Sun(object):
 class Storm:
     def __init__(self, weather):
         self.weather = weather
-        self._t = weather.precipitation if weather.precipitation > 0.0 else -50.0
+        self.init_precipitation = weather.precipitation if weather.precipitation > 0.0 else -50.0
+
+    def reset(self):
+        self._t = self.init_precipitation
         self._increasing = True
 
     def tick(self, delta):
@@ -63,12 +70,7 @@ class Storm:
 class Weather:
     def __init__(self, world):
         self.world = world
-        self.init_weather = world.get_weather()
-        
-        self.reset()
-
-    def reset(self):
-        self.weather = self.init_weather
+        self.weather = world.get_weather()
         self.sun = Sun(self.weather)
         self.storm = Storm(self.weather)
         self.prev_t = 0
@@ -77,7 +79,8 @@ class Weather:
     def tick(self, curr_t):
         delta = curr_t - self.prev_t
         if delta < 0:
-            self.reset()
+            self.sun.reset()
+            self.storm.reset()
             delta = curr_t
             
         while delta > 0:
