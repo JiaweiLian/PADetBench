@@ -19,11 +19,11 @@ def run(
         save_path = 'data',  # Define the output directory
         map='Town10HD_Opt',  # Name of the map
         spawn_point=0,  # Index of the spawn point: 0-154 (Town10HD_Opt)
-        vehicle_blueprint_id='vehicle.audi.etron_white',  # Blueprint ID of the vehicle
+        vehicle_blueprint_id='vehicle.audi.etron',  # Blueprint ID of the vehicle
         rotate_angles = [0],  # Rotation range of the camera
-        dolly_radius = [10],  # Enable dolly
-        dolly_heights = [5],  # Height of the spectator
-        weather_deltas = [0],  # Enable weather changing
+        dolly_radius = [5],  # Enable dolly
+        dolly_heights = [3],  # Height of the spectator
+        weather_deltas = [100],  # Enable weather changing
 ):
 
     # Connect to the client and retrieve the world object
@@ -52,7 +52,7 @@ def run(
     for i in range(iteration_len):
         camera.rotate(rotate_angles[i%len(rotate_angles)])
         camera.dolly(dolly_radius[i%len(dolly_radius)], dolly_heights[i%len(dolly_heights)])
-        weather.tick(weather_deltas[i%len(weather_deltas)]-weather_deltas[(i-1)%len(weather_deltas)])
+        weather.tick(weather_deltas[i%len(weather_deltas)])
 
         sys.stdout.write('\r' + str(weather) + 12 * ' ')
         sys.stdout.flush()
