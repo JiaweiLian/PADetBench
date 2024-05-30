@@ -7,25 +7,42 @@ import carla
 from pascal_voc_writer import Writer
 
 def get_image_point(loc, K, w2c):
-        # Calculate 2D projection of 3D coordinate
+    # Calculate 2D projection of 3D coordinate
 
-        # Format the input coordinate (loc is a carla.Position object)
-        point = np.array([loc.x, loc.y, loc.z, 1])
-        # transform to camera coordinates
-        point_camera = np.dot(w2c, point)
+    # Format the input coordinate (loc is a carla.Position object)
+    point = np.array([loc.x, loc.y, loc.z, 1])
+    # transform to camera coordinates
+    point_camera = np.dot(w2c, point)
 
-        # New we must change from UE4's coordinate system to an "standard"
-        # (x, y ,z) -> (y, -z, x)
-        # and we remove the fourth componebonent also
-        point_camera = [point_camera[1], -point_camera[2], point_camera[0]]
+    # New we must change from UE4's coordinate system to an "standard"
+    # (x, y ,z) -> (y, -z, x)
+    # and we remove the fourth componebonent also
+    point_camera = [point_camera[1], -point_camera[2], point_camera[0]]
 
-        # now project 3D->2D using the camera matrix
-        point_img = np.dot(K, point_camera)
-        # normalize
-        point_img[0] /= point_img[2]
-        point_img[1] /= point_img[2]
+    # now project 3D->2D using the camera matrix
+    point_img = np.dot(K, point_camera)
+    # normalize
+    point_img[0] /= point_img[2]
+    point_img[1] /= point_img[2]
 
-        return point_img[0:2]
+    return point_img[0:2]
+
+def get_2d_bb(verts, K, world_2_camera):
+    point_pairs = []
+    for vert in verts:
+        point_pairs.append(get_image_point(vert, K, world_2_camera))
+    
+    x_list, y_list = zip(*point_pairs)
+    # Find the rightmost vertex
+    x_max = max(x_list)
+    # Find the leftmost vertex
+    x_min = min(x_list)
+    # Find the highest vertex
+    y_max = max(y_list)
+    # Find the lowest  vertex
+    y_min = min(y_list)
+
+    return x_max, x_min, y_max, y_min
 
 def build_projection_matrix(w, h, fov):
     focal = w / (2.0 * np.tan(fov * np.pi / 360.0))
@@ -61,9 +78,6 @@ class DatasetGenerator:
         # Calculate the camera projection matrix to project from 3D -> 2D
         self.K = build_projection_matrix(self.image_w, self.image_h, fov)
 
-        # Remember the edge pairs
-        self.edges = [[0,1], [1,3], [3,2], [2,0], [0,4], [4,5], [5,1], [5,7], [7,6], [6,4], [6,2], [7,3]]
-
         self.annotation_id = 1
         self.coco_label_json = {
         "info": ['none'], 
@@ -85,6 +99,20 @@ class DatasetGenerator:
         if not os.path.exists(self.save_path):
             os.makedirs(self.save_path)
         self.writer = Writer(self.save_path, self.image_w, self.image_h)
+
+    def add_3dbb_to_img(self, img, verts, world_2_camera):
+        edges = [[0,1], [1,3], [3,2], [2,0], [0,4], [4,5], [5,1], [5,7], [7,6], [6,4], [6,2], [7,3]]
+        for edge in edges:
+            p1x, p1y = get_image_point(verts[edge[0]], self.K, world_2_camera)
+            p2x, p2y = get_image_point(verts[edge[1]],  self.K, world_2_camera)
+            cv2.line(img, (int(p1x),int(p1y)), (int(p2x),int(p2y)), (255,0,0, 255), 1)
+
+    def add_2dbb_to_img(self, img, verts, world_2_camera):
+        x_max, x_min, y_max, y_min = get_2d_bb(verts, self.K, world_2_camera)
+        cv2.line(img, (int(x_min),int(y_min)), (int(x_max),int(y_min)), (0,0,255, 255), 1)
+        cv2.line(img, (int(x_min),int(y_max)), (int(x_max),int(y_max)), (0,0,255, 255), 1)
+        cv2.line(img, (int(x_min),int(y_min)), (int(x_min),int(y_max)), (0,0,255, 255), 1)
+        cv2.line(img, (int(x_max),int(y_min)), (int(x_max),int(y_max)), (0,0,255, 255), 1)
 
     def save_data(self, save_images = True, save_pascal_voc = False, save_images_with_2d_bb = False, save_images_with_3d_bb = False):
 
@@ -113,41 +141,15 @@ class DatasetGenerator:
             dist = npc.get_transform().location.distance(self.spectator.get_transform().location)
             if dist > 50:
                 continue
+            
             forward_vec = self.spectator.get_transform().get_forward_vector()
             ray = npc.get_transform().location - self.spectator.get_transform().location
             if forward_vec.dot(ray) > 1:
-                p1 = get_image_point(bb.location, self.K, world_2_camera)
                 verts = [v for v in bb.get_world_vertices(npc.get_transform())]
-                if save_images_with_3d_bb:
-                    for edge in self.edges:
-                        p1 = get_image_point(verts[edge[0]], self.K, world_2_camera)
-                        p2 = get_image_point(verts[edge[1]],  self.K, world_2_camera)
-                        cv2.line(img, (int(p1[0]),int(p1[1])), (int(p2[0]),int(p2[1])), (255,0,0, 255), 1)        
+                # p1 = get_image_point(bb.location, self.K, world_2_camera)
 
-                x_max = -10000
-                x_min = 10000
-                y_max = -10000
-                y_min = 10000
-                for vert in verts:
-                    p = get_image_point(vert, self.K, world_2_camera)
-                    # Find the rightmost vertex
-                    if p[0] > x_max:
-                        x_max = p[0]
-                    # Find the leftmost vertex
-                    if p[0] < x_min:
-                        x_min = p[0]
-                    # Find the highest vertex
-                    if p[1] > y_max:
-                        y_max = p[1]
-                    # Find the lowest  vertex
-                    if p[1] < y_min:
-                        y_min = p[1]
-                if save_images_with_2d_bb:
-                    cv2.line(img, (int(x_min),int(y_min)), (int(x_max),int(y_min)), (0,0,255, 255), 1)
-                    cv2.line(img, (int(x_min),int(y_max)), (int(x_max),int(y_max)), (0,0,255, 255), 1)
-                    cv2.line(img, (int(x_min),int(y_min)), (int(x_min),int(y_max)), (0,0,255, 255), 1)
-                    cv2.line(img, (int(x_max),int(y_min)), (int(x_max),int(y_max)), (0,0,255, 255), 1)
-
+                x_max, x_min, y_max, y_min = get_2d_bb(verts, self.K, world_2_camera)
+                    
                 # Add the object to the frame (ensure it is inside the image)
                 if x_min > 0 and x_max < self.image_w and y_min > 0 and y_max < self.image_h: 
                     self.writer.addObject('car', x_min, y_min, x_max, y_max)
@@ -165,6 +167,12 @@ class DatasetGenerator:
                                 }
                     self.coco_label_json['annotations'].append(annotation)
                     self.annotation_id += 1
+
+                if save_images_with_3d_bb:
+                    self.add_3dbb_to_img(img, verts, world_2_camera)
+
+                if save_images_with_2d_bb:
+                    self.add_2dbb_to_img(img, verts, world_2_camera)
 
         if save_pascal_voc:
             # Save the bounding boxes in the scene
