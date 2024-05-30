@@ -164,7 +164,7 @@ class DatasetGenerator:
                                 'segmentation': []
                                 }
                     self.coco_label_json['annotations'].append(annotation)
-                    annotation_id += 1
+                    self.annotation_id += 1
 
         if save_pascal_voc:
             # Save the bounding boxes in the scene
