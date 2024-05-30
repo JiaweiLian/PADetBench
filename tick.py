@@ -103,7 +103,7 @@ class Camera:
         camera_blueprint.set_attribute('image_size_y', image_height)
 
         # Get the camera attributes
-        camera_initial_transform = carla.Transform(carla.Location(x=0.0, y=0.0, z=2.0))  
+        camera_initial_transform = carla.Transform(carla.Location(x=0.0, y=0.0, z=0.0))  
         self.camera = world.spawn_actor(camera_blueprint, camera_initial_transform, attach_to=self.base_spectator)
 
         # Get the attributes from the camera
