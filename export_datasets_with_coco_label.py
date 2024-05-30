@@ -15,9 +15,9 @@ from data_process import DatasetGenerator
 
 def run(
         map='Town10HD_Opt',  # Name of the map
-        radius=6,  # Radius of the spectator rotation circle
-        height=3,  # Height of the spectator
-        spawn_point=0,  # Index of the spawn point: 0-154 (Town10HD_Opt)
+        radius=10,  # Radius of the spectator rotation circle
+        height=5,  # Height of the spectator
+        spawn_point=3,  # Index of the spawn point: 0-154 (Town10HD_Opt)
         speed_rotation_degree = 1.0,  # Define the speed of the rotation (degree)
         vehicle_blueprint_id='vehicle.audi.etron_white',  # Blueprint ID of the vehicle
         save_path = r'data',  # Define the output directory
@@ -72,7 +72,7 @@ def run(
 
         # Update the weather
         weather.tick(speed_weather_changing)
-        
+
         sys.stdout.write('\r' + str(weather) + 12 * ' ')
         sys.stdout.flush()
 
