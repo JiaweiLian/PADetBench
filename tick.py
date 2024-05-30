@@ -111,7 +111,7 @@ class Camera:
         # Calculate the camera projection matrix to project from 3D -> 2D
         self.K = build_projection_matrix(self.image_w, self.image_h, self.fov)
 
-    def is_vehicle_in_shot(self):
+    def is_in_view(self):
         forward_vec = self.base_spectator.get_transform().get_forward_vector()
         ray = self.vehicle.get_transform().location - self.base_spectator.get_transform().location
         # ray = self.vehicle.get_location().get_transform().location - self.base_spectator.get_transform().location
