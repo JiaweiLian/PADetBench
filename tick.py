@@ -90,6 +90,10 @@ class Weather:
             delta -= 10
         self.world.set_weather(self.weather)
 
+        # wait until the weather is updated
+        for _ in range(5):
+            self.world.tick()
+
         self.prev_t = curr_t
 
     def __str__(self):
@@ -150,10 +154,6 @@ class Camera:
         return self.camera_blueprint.get_attribute('image_size_x'), self.camera_blueprint.get_attribute('image_size_y')
 
     def get_image(self):
-        # Wait until the image is updated
-        for _ in range(5):
-            self.world.tick()
-
         # clear the queue
         while not self.image_queue.empty():
             self.image_queue.get()
@@ -199,11 +199,12 @@ class Camera:
         # Create a new transform with the new location and the new rotation
         spectator_transform = carla.Transform(location, rotation)
 
-        # Get the transform of the camera before the tick
-        prev_transform = self.get_transform()
-
         # Set the new transform to the spectator
         self.base_spectator.set_transform(spectator_transform)
+
+        # wait until the camera is updated
+        for _ in range(5):
+            self.world.tick()
 
 class Actor:
     def __init__(self, world) -> None:
