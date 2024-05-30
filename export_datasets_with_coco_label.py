@@ -11,7 +11,7 @@ import numpy as np
 import cv2
 from pascal_voc_writer import Writer
 import json
-from tick import Weather
+from tick import Weather, Spectator
 
 
 def run(
@@ -58,11 +58,8 @@ def run(
     settings.fixed_delta_seconds = 0.05
     world.apply_settings(settings)
 
-    angle_radian = 0.0  # Initial angle_radian of the spectator
-    angle_degree = 0.0  # Initial angle_degree of the spectator
-
     # Get the spectator
-    spectator = world.get_spectator()
+    spectator = Spectator(world.get_spectator(), vehicle, radius, height)
 
     # Create a blueprint for the camera
     camera_blueprint = world.get_blueprint_library().find(sensor_blueprint_id)
@@ -71,7 +68,7 @@ def run(
     # Attach the camera to the spectator
     # The camera's transform relative to the spectator is set same as camera attach to the ego vehicle, otherwise the calculated bounding box will be inaccurate
     camera_initial_transform = carla.Transform(carla.Location(x=0.0, y=0.0, z=2.0))  
-    camera = world.spawn_actor(camera_blueprint, camera_initial_transform, attach_to=spectator)
+    camera = world.spawn_actor(camera_blueprint, camera_initial_transform, attach_to=spectator.base_spectator)
 
     # Get the world to camera matrix
     world_2_camera = np.array(camera.get_transform().get_inverse_matrix())
@@ -120,12 +117,9 @@ def run(
     image_queue = queue.Queue()
     camera.listen(image_queue.put)
 
-    while angle_degree < total_rotation_degree:
-        # Calculate the transform of the spectator
-        transform = rotation_transform_update(vehicle, radius, height, angle_radian)
-        transform.location.z -= 2.0
-        # Set the transform of the spectator
-        spectator.set_transform(transform) 
+    while spectator.angle_degree < total_rotation_degree:
+        # Update the spectator
+        spectator.tick(speed_rotation_degree)
 
         # Update the weather
         weather.tick(speed_weather_changing)
@@ -143,7 +137,7 @@ def run(
 
         weather_string = str(weather).replace(' ', '_').replace(':', '').replace(',', '').replace('(', '_').replace(')', '').replace('=', '').replace('%', '').replace('.', '_')
         # image_id = '%06d' % angle_degree + '_R%02d' % radius + '_H%02d_' % height + weather_string + '_' + map  # Detailed information of the image
-        image_id = '%06d' % angle_degree
+        image_id = '%06d' % spectator.angle_degree
         image_name = image_id + '.png'
 
         image_json = {'file_name': image_name, 'height': image.height, 'width': image.width, 'id': int(image_id)}
@@ -218,10 +212,6 @@ def run(
             # Save the bounding boxes in the scene
             writer.save(output_path.replace('.png', '.xml'))
 
-        # Calculate the angle_radian based on the speed
-        angle_degree += speed_rotation_degree
-        angle_radian = (math.pi * 2.0 / 360.0) * angle_degree
-
         if save_images_with_bb:
             cv2.imwrite(output_path.replace('.png', '_bb.png'), img)
 
@@ -269,7 +259,9 @@ def get_image_point(loc, K, w2c):
         return point_img[0:2]
 
 # Define a function that calculates the transform of the spectator
-def rotation_transform_update(vehicle, radius, height, angle_radian):
+def rotation_transform_update(vehicle, radius, height, angle_degree):
+    angle_radian = (math.pi * 2.0 / 360.0) * angle_degree
+
     # Get the location of the vehicle
     vehicle_location = vehicle.get_location()
 

@@ -69,29 +69,38 @@ class Weather:
 
 # Define a function that calculates the transform of the spectator
 class Spectator:
-    def __init__(self, vehicle, radius, height):
+    def __init__(self, base_spectator, vehicle, radius, height):
+        self.base_spectator = base_spectator
         self.vehicle = vehicle
         self.radius = radius
         self.height = height
-        self.angle_radian = 0.0
+        self.angle_degree = 0.0
 
     def tick(self, speed_rotation_degree):
         # Update the angle of the spectator
-        self.angle_radian = 0
+        angle_degree += speed_rotation_degree
+        angle_radian = (math.pi * 2.0 / 360.0) * angle_degree
 
         # Get the location of the vehicle
         vehicle_location = self.vehicle.get_location()
 
         # Calculate the new location of the spectator
         location = carla.Location()
-        location.x = vehicle_location.x + self.radius * math.cos(self.angle_radian)  # X-coordinate
-        location.y = vehicle_location.y + self.radius * math.sin(self.angle_radian)  # Y-coordinate
+        location.x = vehicle_location.x + self.radius * math.cos(angle_radian)  # X-coordinate
+        location.y = vehicle_location.y + self.radius * math.sin(angle_radian)  # Y-coordinate
         location.z = vehicle_location.z + self.height                    # Z-coordinate
 
         # Calculate the rotation that makes the spectator look at the vehicle
         rotation = carla.Rotation()
-        rotation.yaw = math.degrees(self.angle_radian) + 180 # Yaw angle_radian
+        rotation.yaw = math.degrees(angle_radian) + 180 # Yaw angle_radian
         rotation.pitch = -math.degrees(math.atan(self.height / self.radius))  # Pitch angle_radian
 
         # Create a new transform with the new location and the new rotation
         transform = carla.Transform(location, rotation)
+        transform.location.z -= 2.0
+
+        # Set the new transform to the spectator
+        self.base_spectator.set_transform(transform)
+
+    def get_transform(self):
+        return self.base_spectator.get_transform()
