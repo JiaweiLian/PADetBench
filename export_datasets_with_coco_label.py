@@ -60,7 +60,8 @@ def run(
         world.tick()
 
         # Save the data in the pascal voc format
-        datasetGenerator.save_data(save_images=True, save_pascal_voc=True, save_images_with_2d_bb=True, save_images_with_3d_bb=True)
+        # datasetGenerator.save_data(save_images=True, save_pascal_voc=True, save_images_with_2d_bb=True, save_images_with_3d_bb=True)
+        datasetGenerator.save_data(save_images=True)
 
         if keyboard.is_pressed('q'):  
             print('You pressed q, loop will break')
