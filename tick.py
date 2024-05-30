@@ -65,6 +65,7 @@ class Weather:
         self.sun = Sun(self.weather)
         self.storm = Storm(self.weather)
         self.prev_t = 0
+        self.tick(0)
 
     def tick(self, curr_t):
         delta = curr_t - self.prev_t
