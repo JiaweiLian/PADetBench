@@ -190,6 +190,10 @@ class Actor:
     def create_actor(self, blueprint, spawn_point):
         if self.blueprint == blueprint and self.spawn_point == spawn_point:
             return
+        
+        # Destroy the previous actor
+        if self.actor is not None:
+            self.actor.destroy()
 
         # Choose a spawn location
         # In this example, we're spawningradius of the circle the vehicle at a random location
