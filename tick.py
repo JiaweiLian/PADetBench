@@ -162,6 +162,6 @@ class Camera:
         spectator_transform.location.z -= 2.0
 
         # Set the new transform to the spectator
-        self.base_spectator.set_transform(`spectator_transform`)
+        self.base_spectator.set_transform(spectator_transform)
 
     

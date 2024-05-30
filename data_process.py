@@ -155,8 +155,3 @@ class DatasetGenerator:
         # Save the json file with the annotations
         with open(os.path.join(self.save_path, 'annotations', 'captions_val2017.json'), 'w') as f:
             json.dump(self.coco_label_json, f)
-
-    def __del__(self):
-        self.annotation_save()
-        self.camera.stop()
-        self.camera.destroy()
