@@ -2,6 +2,7 @@ import re
 import numpy as np
 import math
 import queue
+import time
 import carla
 
 def clamp(value, minimum=0.0, maximum=100.0):
@@ -82,7 +83,7 @@ def build_projection_matrix(w, h, fov):
 
 # Define a function that calculates the transform of the spectator
 class Camera:
-    def __init__(self, world, vehicle, radius, height, sensor_blueprint_id='sensor.camera.rgb', image_width='800', image_height='600'):
+    def __init__(self, world, vehicle, radius:int, height:int, sensor_blueprint_id='sensor.camera.rgb', image_width='800', image_height='600'):
         self.base_spectator = world.get_spectator()
         self.vehicle = vehicle
         self.radius = radius
@@ -103,13 +104,14 @@ class Camera:
         self.image_w = camera_blueprint.get_attribute("image_size_x").as_int()
         self.image_h = camera_blueprint.get_attribute("image_size_y").as_int()
         self.fov = camera_blueprint.get_attribute("fov").as_float()
+        
+        # Calculate the camera projection matrix to project from 3D -> 2D
+        self.K = build_projection_matrix(self.image_w, self.image_h, self.fov)
 
         # Create a queue to store and retrieve the sensor data
         self.image_queue = queue.Queue()
         self.camera.listen(self.image_queue.put)
 
-        # Calculate the camera projection matrix to project from 3D -> 2D
-        self.K = build_projection_matrix(self.image_w, self.image_h, self.fov)
 
     def is_in_view(self):
         forward_vec = self.base_spectator.get_transform().get_forward_vector()
@@ -118,7 +120,7 @@ class Camera:
         return forward_vec.dot(ray) > 1
     
     def get_vertices(self):
-        verts = [v for v in self.vehicle.bounding_box.get_world_vertices(self.vehicle.get_transform())]
+        verts = [v for v in self.vehicle.get_bounding_box().get_world_vertices(self.vehicle.get_transform())]
 
         # p1 = get_image_point(npc.bounding_box.location, self.camera.K, world_2_camera)
         return verts
@@ -133,7 +135,7 @@ class Camera:
         return self.camera_blueprint.get_attribute('image_size_x'), self.camera_blueprint.get_attribute('image_size_y')
 
     def get_image(self):
-        self.image_queue.get()
+        return self.image_queue.get()
 
     def tick(self, speed_rotation_degree):
         # Update the angle of the spectator
@@ -163,4 +165,28 @@ class Camera:
         # Set the new transform to the spectator
         self.base_spectator.set_transform(spectator_transform)
 
+class Actor:
+    def __init__(self, world, blueprint_id, spawn_point) -> None:
+        # Get the blueprint library and filter for the vehicle blueprints
+        blueprint = world.get_blueprint_library().find(blueprint_id)
+        
+        # Choose a spawn location
+        # In this example, we're spawningradius of the circle the vehicle at a random location
+        spawn_points = world.get_map().get_spawn_points()  # len(transforms) = 155 for Town10HD_Opt
+        actor_transform = spawn_points[spawn_point]
+        
+        # Spawn the vehicle
+        self.actor = world.spawn_actor(blueprint, actor_transform)
+        time.sleep(1)  # Wait for the vehicle to be ready
+
+    def get_transform(self):
+        return self.actor.get_transform()
     
+    def get_location(self):
+        return self.actor.get_location()
+    
+    def get_bounding_box(self):
+        return self.actor.bounding_box
+
+    def __del__(self):
+        self.actor.destroy()

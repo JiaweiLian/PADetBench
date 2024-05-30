@@ -9,7 +9,7 @@ import keyboard
 import numpy as np
 import cv2
 import json
-from tick import Weather, Camera
+from tick import Weather, Camera, Actor
 from data_process import DatasetGenerator
 
 
@@ -28,17 +28,8 @@ def run(
     client = carla.Client('localhost', 2000)
     world = client.load_world(map)
 
-    # Get the blueprint library and filter for the vehicle blueprints
-    vehicle_blueprint = world.get_blueprint_library().find(vehicle_blueprint_id)
-
-    # Choose a spawn location
-    # In this example, we're spawningradius of the circle the vehicle at a random location
-    spawn_points = world.get_map().get_spawn_points()  # len(transforms) = 155 for Town10HD_Opt
-    vehicle_transform = spawn_points[spawn_point]
-
     # Spawn the vehicle
-    vehicle = world.spawn_actor(vehicle_blueprint, vehicle_transform)
-    time.sleep(1)  # Wait for the vehicle to be ready
+    vehicle = Actor(world, vehicle_blueprint_id, spawn_point)
 
     # # Wait for the vehicle to be ready
     # world_tick(20, world)
@@ -88,7 +79,7 @@ def run(
     datasetGenerator.annotation_save()
 
     # Destroy the vehicle
-    vehicle.destroy()
+    del vehicle
 
     settings.synchronous_mode = False # Enables synchronous mode
     world.apply_settings(settings)

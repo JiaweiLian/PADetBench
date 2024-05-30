@@ -71,15 +71,15 @@ class DatasetGenerator:
             os.makedirs(self.save_path)
         self.writer = Writer(self.save_path, camera.image_w, camera.image_h)
 
-    def add_3dbb_to_img(self, img, verts, world_2_camera):
+    def add_3dbb_to_img(self, img, verts, K, world_2_camera):
         edges = [[0,1], [1,3], [3,2], [2,0], [0,4], [4,5], [5,1], [5,7], [7,6], [6,4], [6,2], [7,3]]
         for edge in edges:
-            p1x, p1y = get_image_point(verts[edge[0]], self.K, world_2_camera)
+            p1x, p1y = get_image_point(verts[edge[0]], K, world_2_camera)
             p2x, p2y = get_image_point(verts[edge[1]],  self.K, world_2_camera)
             cv2.line(img, (int(p1x),int(p1y)), (int(p2x),int(p2y)), (255,0,0, 255), 1)
 
-    def add_2dbb_to_img(self, img, verts, world_2_camera):
-        x_max, x_min, y_max, y_min = get_2d_bb(verts, self.K, world_2_camera)
+    def add_2dbb_to_img(self, img, verts, K, world_2_camera):
+        x_max, x_min, y_max, y_min = get_2d_bb(verts, K, world_2_camera)
         cv2.line(img, (int(x_min),int(y_min)), (int(x_max),int(y_min)), (0,0,255, 255), 1)
         cv2.line(img, (int(x_min),int(y_max)), (int(x_max),int(y_max)), (0,0,255, 255), 1)
         cv2.line(img, (int(x_min),int(y_min)), (int(x_min),int(y_max)), (0,0,255, 255), 1)
@@ -134,10 +134,10 @@ class DatasetGenerator:
             image.save_to_disk(output_path)
 
         if save_images_with_3d_bb:
-            self.add_3dbb_to_img(img, verts, world_2_camera)
+            self.add_3dbb_to_img(img, verts, self.camera.K, world_2_camera)
 
         if save_images_with_2d_bb:
-            self.add_2dbb_to_img(img, verts, world_2_camera)
+            self.add_2dbb_to_img(img, verts, self.camera.K, world_2_camera)
 
         if save_pascal_voc:
             # Save the bounding boxes in the scene
