@@ -18,12 +18,7 @@ from data_process import DatasetGenerator
 
 def run(
         world,  # Name of the map
-        spawnpoint_list,  # Index of the spawn point: 0-154 (Town10HD_Opt)
-        blueprint_list,  # Blueprint ID of the vehicle
-        theta_list,  # Rotation range of the camera
-        phi_list,  # Height of the spectator
-        radius_list,  # Enable dolly
-        weather_list,  # Enable weather changing
+        settings,  # Settings for the dataset generation
         dataset_name = 'dataset',  # Define the dataset name
         save_path = 'data',  # Define the output directory
 ):
@@ -40,15 +35,12 @@ def run(
     # Create the dataset generator
     datasetGenerator = DatasetGenerator(world, camera, save_path, dataset_name)
     
-    iteration_len = max(len(theta_list), len(phi_list), len(radius_list), len(weather_list))
-    if iteration_len != min(len(theta_list), len(phi_list), len(radius_list), len(weather_list)):
-        print('The length of the lists must be the same')
-        return
+    iteration_len = len(settings['theta_list'])
     for i in range(iteration_len):
-        vehicle.create_actor(blueprint_list[i], spawnpoint_list[i])
-        camera.rotate(theta_list[i], phi_list[i])
-        camera.dolly(radius_list[i])
-        weather.tick(weather_list[i])
+        vehicle.create_actor(settings['blueprint_list'][i], settings['spawnpoint_list'][i])
+        camera.rotate(settings['theta_list'][i], settings['phi_list'][i])
+        camera.dolly(settings['radius_list'][i])
+        weather.tick(settings['weather_list'][i])
 
         sys.stdout.write('\r' + str(weather) + 12 * ' ')
         sys.stdout.flush()
@@ -92,7 +84,7 @@ def world_close(world):
 
 def settings_complete(settings, dataset_len=100):
     if 'spawnpoint_list' not in settings:
-        settings['theta_list'] = [0] * dataset_len
+        settings['spawnpoint_list'] = [0] * dataset_len
     if 'blueprint_list' not in settings:
         settings['blueprint_list'] = [world.get_blueprint_library().filter('vehicle.*')[0]] * dataset_len
     if 'theta_list' not in settings:
@@ -121,6 +113,10 @@ if __name__ == '__main__':
     settings = dict()
 
     # benchmark settings
+    if args.benchmark == 'vehicle':
+        dataset_name='vehicle'
+        settings['blueprint_list'] = world.get_blueprint_library().filter('vehicle.*')
+        dataset_len = len(settings['blueprint_list'])
     if args.benchmark == 'rotation-theta':
         dataset_name='rotation-theta'
         dataset_len = default_dataset_len
@@ -136,10 +132,6 @@ if __name__ == '__main__':
     if args.benchmark == 'weather':
         dataset_name='weather'
         settings['weather_list'] = [i * 1 for i in range(dataset_len)]
-    if args.benchmark == 'vehicle':
-        dataset_name='vehicle'
-        settings['blueprint_list'] = world.get_blueprint_library().filter('vehicle.*')
-        dataset_len = len(settings['blueprint_list'])
 
     run(world=world, settings=settings, dataset_name=dataset_name, save_path=args.save_path)
 
