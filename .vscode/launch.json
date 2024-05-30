@@ -1,0 +1,18 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "export_datasets_with_coco_label",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "export_datasets_with_coco_label.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--benchmark", "distance"
+            ]
+        }
+    ]
+}
