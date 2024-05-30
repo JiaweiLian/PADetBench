@@ -81,7 +81,7 @@ def settings_complete(settings, dataset_len=100):
     if 'spawnpoint_list' not in settings:
         settings['spawnpoint_list'] = [world.get_map().get_spawn_points()[0]] * dataset_len
     if 'blueprint_list' not in settings:
-        settings['blueprint_list'] = [world.get_blueprint_library().filter('vehicle.*')[0] * dataset_len]
+        settings['blueprint_list'] = [world.get_blueprint_library().filter('vehicle.*')[0]] * dataset_len
     if 'theta_list' not in settings:
         settings['theta_list'] = [math.pi/3] * dataset_len
     if 'phi_list' not in settings:
