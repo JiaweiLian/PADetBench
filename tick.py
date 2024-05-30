@@ -64,11 +64,16 @@ class Weather:
         self.weather = world.get_weather()
         self.sun = Sun(self.weather)
         self.storm = Storm(self.weather)
+        self.prev_t = 0
 
-    def tick(self, delta=10.0):
+    def tick(self, curr_t):
+        delta = curr_t - self.prev_t
         self.sun.tick(delta)
         self.storm.tick(delta)
         self.world.set_weather(self.weather)
+        
+        self.prev_t = curr_t
+
 
     def __str__(self):
         return '%s %s' % (self.sun, self.storm)
@@ -89,7 +94,7 @@ class Camera:
         self.vehicle = vehicle
         self.radius = 5.0
         self.height = 0.0
-        self.angle_degree = 0.0
+        self.theta = 0.0
         self.tick()
 
         # Create a blueprint for the camera
@@ -141,36 +146,36 @@ class Camera:
         self.world.tick()
         return self.image_queue.get()
 
-    def rotate(self, angle_degree):
-        self.angle_degree = angle_degree
+    def rotate(self, theta, phi):
+        if self.theta == theta and self.phi == phi:
+            return
+        self.theta = theta
+        self.phi = phi
         self.tick()
 
-    def dolly(self, radius, height):
+    def dolly(self, radius):
+        if self.radius == radius:
+            return
         self.radius = radius
-        self.height = height
         self.tick()
 
     def tick(self):
         # Get the location of the vehicle
         vehicle_location = self.vehicle.get_location()
 
-        # Calculate the angle in radians
-        angle_radian = (math.pi * 2.0 / 360.0) * self.angle_degree
-
         # Calculate the new location of the spectator
         location = carla.Location()
-        location.x = vehicle_location.x + self.radius * math.cos(angle_radian)  # X-coordinate
-        location.y = vehicle_location.y + self.radius * math.sin(angle_radian)  # Y-coordinate
-        location.z = vehicle_location.z + self.height                           # Z-coordinate
+        location.x = vehicle_location.x + self.radius * math.sin(self.theta) * math.cos(self.phi)
+        location.y = vehicle_location.y + self.radius * math.sin(self.theta) * math.sin(self.phi)
+        location.z = vehicle_location.z + self.radius * math.cos(self.theta)
 
         # Calculate the rotation that makes the spectator look at the vehicle
         rotation = carla.Rotation()
-        rotation.yaw = math.degrees(angle_radian) + 180 # Yaw angle_radian
-        rotation.pitch = -math.degrees(math.atan(self.height / self.radius))  # Pitch angle_radian
+        rotation.yaw = math.degrees(self.phi) + 180 # Yaw angle_radian
+        rotation.pitch = -math.degrees(self.theta)  # Pitch angle_radian
 
         # Create a new transform with the new location and the new rotation
         spectator_transform = carla.Transform(location, rotation)
-        spectator_transform.location.z -= 2.0
 
         # Set the new transform to the spectator
         self.base_spectator.set_transform(spectator_transform)

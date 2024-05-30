@@ -1,4 +1,6 @@
 from ast import arg
+
+from traitlets import default
 import carla
 import random
 import math
@@ -20,10 +22,11 @@ def run(
         map='Town10HD_Opt',  # Name of the map
         spawn_point=0,  # Index of the spawn point: 0-154 (Town10HD_Opt)
         vehicle_blueprint_id='vehicle.audi.etron',  # Blueprint ID of the vehicle
-        rotate_angles = [0],  # Rotation range of the camera
-        dolly_radius = [5],  # Enable dolly
-        dolly_heights = [3],  # Height of the spectator
-        weather_deltas = [100],  # Enable weather changing
+        theta_list = [math.pi/3],  # Rotation range of the camera
+        phi_list = [0],  # Height of the spectator
+        radius_list = [5],  # Enable dolly
+        weather_list = [100],  # Enable weather changing
+        
 ):
 
     # Connect to the client and retrieve the world object
@@ -47,18 +50,20 @@ def run(
 
     # Create the dataset generator
     datasetGenerator = DatasetGenerator(world, camera, save_path, dataset_name)
-
-    iteration_len = max(len(rotate_angles), len(dolly_radius), len(dolly_heights), len(weather_deltas))
+    
+    iteration_len = max(len(theta_list), len(phi_list), len(radius_list), len(weather_list))
+    if iteration_len != min(len(theta_list), len(phi_list), len(radius_list), len(weather_list)):
+        print('The length of the lists must be the same')
+        return
     for i in range(iteration_len):
-        camera.rotate(rotate_angles[i%len(rotate_angles)])
-        camera.dolly(dolly_radius[i%len(dolly_radius)], dolly_heights[i%len(dolly_heights)])
-        weather.tick(weather_deltas[i%len(weather_deltas)])
+        camera.rotate(theta_list[i], phi_list[i])
+        camera.dolly(radius_list[i])
+        weather.tick(weather_list[i])
 
         sys.stdout.write('\r' + str(weather) + 12 * ' ')
         sys.stdout.flush()
 
         camera_transform_before_tick = camera.get_transform()
-
         world.tick()
         while camera_transform_before_tick == camera.get_transform():
             time.sleep(0.0001)
@@ -88,18 +93,28 @@ if __name__ == '__main__':
     parser.add_argument('--benchmark', type=str, choices=['entire', 'weather', 'distance', 'height', 'rotation', 'spot', 'random'], default='entire', help='Name of the benchmark')
 
     args = parser.parse_args()
+    
+    dataset_len = 100
+    theta_list = [math.pi/3] * dataset_len
+    phi_list = [0] * dataset_len
+    radius_list = [5] * dataset_len
+    weather_list = [100] * dataset_len
 
-    if args.benchmark == 'rotation' or args.benchmark == 'entire':
-        run(dataset_name='rotation', save_path=args.save_path, map=args.map, rotate_angles=range(0, 360, 1))
-    if args.benchmark == 'weather' or args.benchmark == 'entire':
-        run(dataset_name='weather', save_path=args.save_path, map=args.map, weather_deltas=range(0,10000,10))
-    if args.benchmark == 'distance' or args.benchmark == 'entire':
-        run(dataset_name='distance', save_path=args.save_path, map=args.map, dolly_radius=range(3, 20, 1))
-    if args.benchmark == 'height' or args.benchmark == 'entire':
-        run(dataset_name='height', save_path=args.save_path, map=args.map, dolly_heights=range(3, 15, 1))
-    if args.benchmark == 'random' or args.benchmark == 'entire':
+    if args.benchmark == 'rotation-theta':
+        dataset_name='rotation-theta'
+        theta_list = range(-math.pi/2, math.pi/2, math.pi/dataset_len)
+    if args.benchmark == 'rotation-phi':
+        dataset_name='rotation-phi'
+        phi_list = range(0, 2*math.pi, 2*math.pi/dataset_len)
+    if args.benchmark == 'distance':
+        dataset_name='distance'
+        radius_list = range(1, 50, 50/dataset_len)
+    if args.benchmark == 'weather':
+        dataset_name='weather'
+        weather_list = range(0, 10000, 10000/dataset_len)
+    if args.benchmark == 'random':
         len = 10000
         rotate_angles = [random.randint(0, 360) for _ in range(len)]
         dolly_radius = [random.randint(1, 50) for _ in range(len)]
         weather_deltas = range(0,len,10)
-        run(dataset_name='random', save_path=args.save_path, map=args.map, rotate_angles=rotate_angles, dolly_radius=dolly_radius, dolly_heights=[5], weather_deltas=weather_deltas)
+    run(dataset_name=dataset_name, save_path=args.save_path, map=args.map, theta_list=theta_list, phi_list=phi_list, radius_list=radius_list, weather_list=weather_list)
