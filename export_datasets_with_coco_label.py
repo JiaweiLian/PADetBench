@@ -111,6 +111,7 @@ def settings_complete(blueprint_list, settings, grid=True):
 def get_blueprint_list(world, actor_type='vehicle', adv_type='clean'):
     example_types = dict()
     example_types['vehicle'] = ['audi.etron', 'tesla.model3', 'nissan.patrol_2021', 'mercedes.coupe_2020', 'bmw.grandtourer', 'chevrolet.impala', 'jeep.wrangler_rubicon', 'mini.cooper_s_2021', 'mercedes.sprinter', 'lincoln.mkz_2020']
+    example_types['walker'] = ['pedestrian.kid1_v1', 'pedestrian.female1_v1', 'pedestrian.male1_v1']
     world_blueprint_list = world.get_blueprint_library().filter(actor_type+'.*')
     
     # filter the example types in the blueprint list
@@ -137,7 +138,7 @@ if __name__ == '__main__':
     parser.add_argument('--save_path', type=str, default='data', help='Name of the output directory')
     parser.add_argument('--map', type=str, default='Town10HD_Opt', help='Name of the map')
     parser.add_argument('--actor-type', type=str, default='vehicle', help='Name of the dataset')
-    parser.add_argument('--adv-type', type=str, default='clean', choices=['clean', 'random', 'active', 'fca', 'dta'], help='Name of the dataset')
+    parser.add_argument('--adv-type', type=str, default='clean', choices=['clean', 'random', 'active', 'fca', 'dta', 'camou', '3d2fool', 'poopatch', 'rpau', 'appa', 'advcam', 'advtshirt', 'advcat', 'advpattern', 'advpatch', 'inviscloak', 'advtexture', 'dap', 'lap', 'mtd', 'natpatch', 'upc'], help='Name of the dataset')
     parser.add_argument('--benchmark', type=str, choices=['vehicle', 'weather', 'distance', 'rotation-theta', 'rotation-phi', 'sphere', 'spot', 'entire'], default='entire', help='Name of the benchmark')
     args = parser.parse_args()
 
@@ -147,7 +148,11 @@ if __name__ == '__main__':
     dataset_name = args.actor_type + '_' + args.adv_type + '_' + args.benchmark
     blueprint_list = get_blueprint_list(world, actor_type=args.actor_type, adv_type=args.adv_type)
     default_dataset_len = 100
-    distance_range = (5,15)
+    if args.actor_type == 'vehicle':
+        distance_range = (5,15)  # distance range for vehicle benchmark
+    elif args.actor_type == 'walker':
+        distance_range = (1,5)  # distance range for walker benchmark
+
     settings = dict()
 
     # benchmark settings
