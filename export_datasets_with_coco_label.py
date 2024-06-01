@@ -14,6 +14,7 @@ def run(
         settings,  # Settings for the dataset generation
         dataset_name = 'dataset',  # Define the dataset name
         save_path = 'data',  # Define the output directory
+        actor_type = 'vehicle'  # Define the actor type
 ):
     
     # create a vehicle
@@ -26,7 +27,7 @@ def run(
     camera = Camera(world, vehicle)
 
     # Create the dataset generator
-    datasetGenerator = DatasetGenerator(world, camera, save_path, dataset_name)
+    datasetGenerator = DatasetGenerator(world, camera, save_path, dataset_name, actor_type)
     
     iteration_len = len(settings['theta_list'])
     for i in range(iteration_len):
@@ -201,6 +202,6 @@ if __name__ == '__main__':
 
     settings = settings_complete(blueprint_list, settings)
 
-    run(world=world, settings=settings, dataset_name=dataset_name, save_path=args.save_path)
+    run(world=world, settings=settings, dataset_name=dataset_name, save_path=args.save_path, actor_type=args.actor_type)
 
     world_close(world)
