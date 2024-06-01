@@ -82,13 +82,16 @@ def repeat_setting(dataset, iterator):
     except StopIteration:
         return 1
 
-def settings_complete(blueprint_list, settings, grid=True):
+def settings_complete(blueprint_list, settings, actor_type, grid=True):
 
     # default settings
     if 'spawnpoint_list' not in settings:
         settings['spawnpoint_list'] = [world.get_map().get_spawn_points()[0]]
     if 'blueprint_list' not in settings:
-        settings['blueprint_list'] = [blueprint for blueprint in blueprint_list if blueprint.id.find('audi.etron')!=-1]
+        if actor_type == 'vehicle':
+            settings['blueprint_list'] = [blueprint for blueprint in blueprint_list if blueprint.id.find('audi.etron')!=-1]
+        if actor_type == 'walker':
+            settings['blueprint_list'] = [blueprint for blueprint in blueprint_list if blueprint.id.find('pedestrian.female1_v1')!=-1]
     if 'weather_list' not in settings:
         # weather_delta = 1000 represents sunny weather
         settings['weather_list'] = [1000]
@@ -97,7 +100,10 @@ def settings_complete(blueprint_list, settings, grid=True):
     if 'phi_list' not in settings:
         settings['phi_list'] = [0]
     if 'radius_list' not in settings:
-        settings['radius_list'] = [7]
+        if actor_type == 'vehicle':
+            settings['radius_list'] = [7]
+        if actor_type == 'walker':
+            settings['radius_list'] = [2]
 
     if grid:
         # repeat the settings to match the dataset length
@@ -138,9 +144,9 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--save_path', type=str, default='data', help='Name of the output directory')
     parser.add_argument('--map', type=str, default='Town10HD_Opt', help='Name of the map')
-    parser.add_argument('--actor-type', type=str, default='vehicle', help='Name of the dataset')
+    parser.add_argument('--actor-type', type=str, default='vehicle', choices=['vehicle', 'walker'], help='Name of the dataset')
     parser.add_argument('--adv-type', type=str, default='clean', choices=['clean', 'random', 'active', 'fca', 'dta', 'camou', '3d2fool', 'poopatch', 'rpau', 'appa', 'advcam', 'advtshirt', 'advcat', 'advpattern', 'advpatch', 'inviscloak', 'advtexture', 'dap', 'lap', 'mtd', 'natpatch', 'upc'], help='Name of the dataset')
-    parser.add_argument('--benchmark', type=str, choices=['vehicle', 'weather', 'distance', 'rotation-theta', 'rotation-phi', 'sphere', 'spot', 'entire'], default='entire', help='Name of the benchmark')
+    parser.add_argument('--benchmark', type=str, default='entire', choices=['vehicle', 'weather', 'distance', 'rotation-theta', 'rotation-phi', 'sphere', 'spot', 'entire'], help='Name of the benchmark')
     args = parser.parse_args()
 
     world = world_init(args.map)    
@@ -200,7 +206,7 @@ if __name__ == '__main__':
         settings['phi_list'] = [i/phi_len * (2 * math.pi) for i in range(phi_len)]
         settings['radius_list'] = [rescale(i/distance_len, *distance_range) for i in range(distance_len)]
 
-    settings = settings_complete(blueprint_list, settings)
+    settings = settings_complete(blueprint_list, settings, args.actor_type)
 
     run(world=world, settings=settings, dataset_name=dataset_name, save_path=args.save_path, actor_type=args.actor_type)
 
