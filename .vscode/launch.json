@@ -11,9 +11,9 @@
             "program": "export_datasets_with_coco_label.py",
             "console": "integratedTerminal",
             "args": [
-                "--benchmark", "rotation-phi",
+                "--benchmark", "spot",
                 "--actor-type", "walker",
-                "--adv-type", "advcam",
+                "--adv-type", "clean",
             ]
         }
     ]
