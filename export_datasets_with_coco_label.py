@@ -172,14 +172,16 @@ if __name__ == '__main__':
         settings['phi_list'] = [i/phi_len * (2 * math.pi) for i in range(phi_len)]
 
     if args.benchmark == 'spot':
-        theta_len = 3
         phi_len = 8
-        settings['spawnpoint_list'] = world.get_map().get_spawn_points()[:100]
-        # settings['theta_list'] = [i/theta_len * (math.pi / 2) for i in range(1, theta_len)] # without theta = 0, i.e., no overhead view
-        # settings['phi_list'] = [i/phi_len * (2 * math.pi) for i in range(phi_len)]
+        decompose_dataset_len = default_dataset_len//phi_len
+        settings['spawnpoint_list'] = world.get_map().get_spawn_points()[:decompose_dataset_len]
+        settings['phi_list'] = [i/phi_len * (2 * math.pi) for i in range(phi_len)]
 
     if args.benchmark == 'weather':
-        settings['weather_list'] = [i/default_dataset_len * 1000 for i in range(1, default_dataset_len+1)]
+        phi_len = 8
+        decompose_dataset_len = default_dataset_len//phi_len
+        settings['weather_list'] = [i/decompose_dataset_len * 1000 for i in range(1, decompose_dataset_len+1)]
+        settings['phi_list'] = [i/phi_len * (2 * math.pi) for i in range(phi_len)]
 
     if args.benchmark == 'rotation-theta':
         settings['theta_list'] = [i/default_dataset_len * (math.pi / 2) for i in range(default_dataset_len)]
@@ -193,7 +195,10 @@ if __name__ == '__main__':
         settings['phi_list'] = [i/decompose_dataset_len * (2 * math.pi) for i in range(decompose_dataset_len)]
 
     if args.benchmark == 'distance':
-        settings['radius_list'] = [rescale(i/default_dataset_len, *distance_range) for i in range(default_dataset_len)]
+        phi_len = 8
+        decompose_dataset_len = default_dataset_len//phi_len
+        settings['phi_list'] = [i/phi_len * (2 * math.pi) for i in range(phi_len)]
+        settings['radius_list'] = [rescale(i/decompose_dataset_len, *distance_range) for i in range(decompose_dataset_len)]
 
     if args.benchmark == 'entire':
         theta_len = 3
