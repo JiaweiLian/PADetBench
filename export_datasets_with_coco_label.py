@@ -179,7 +179,7 @@ if __name__ == '__main__':
 
     if args.benchmark == 'weather':
         phi_len = 8
-        settings['weather_list'] = [i/default_dataset_len * 1000 for i in range(1, default_dataset_len+1)]
+        settings['weather_list'] = [40,60,80,100,150,180,200,220,250,280]
         settings['phi_list'] = [i/phi_len * (2 * math.pi) for i in range(phi_len)]
 
     if args.benchmark == 'rotation-theta':
