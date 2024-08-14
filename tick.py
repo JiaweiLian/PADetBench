@@ -228,26 +228,43 @@ class Actor:
         # Destroy the previous actor
         if self.base_actor is not None:
             self.base_actor.destroy()
+
+        # Check if the actor is static(Stop sign)
+        if "static" in self.blueprint.id:
+            spawn_point.location.z += 3.0
         
-        # Spawn the vehicle
+        # Spawn the actor
         self.base_actor = self.world.spawn_actor(blueprint, spawn_point)
         self.prev_actors.append(self.base_actor)
 
+        # # Change the actor's transform
+        # if "static" in self.blueprint.id:
+        #     transform = self.base_actor.get_transform()
+        #     transform.rotation.pitch += 180
+        #     self.base_actor.set_transform(transform)
+
         # Wait until the actor stop bouncing
         while True:
-            prev_location = self.get_location()
+            prev_location = self.base_actor.get_location()
             self.world.tick()
-            if prev_location == self.get_location():
+            if prev_location == self.base_actor.get_location():
                 break
 
+        self.location = self.base_actor.get_location()
+        self.bounding_box = self.base_actor.bounding_box
+        self.transform = self.base_actor.get_transform()
+
+        # self.base_actor.destroy()
+        # self.base_actor = None
+
     def get_transform(self):
-        return self.base_actor.get_transform()
+        return self.transform
     
     def get_location(self):
-        return self.base_actor.get_location()
+        return self.location
     
     def get_bounding_box(self):
-        return self.base_actor.bounding_box
+        return self.bounding_box
 
     def __del__(self):
         self.base_actor.destroy()

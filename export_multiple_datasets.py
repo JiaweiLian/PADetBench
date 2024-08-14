@@ -1,7 +1,7 @@
 import subprocess
 
 commands = [
-    # # vehicle
+    # vehicle
     # ["python", "./export_datasets_with_coco_label.py", "--benchmark", "rotation-theta", "--adv-type", "rpau"],
     # ["python", "./export_datasets_with_coco_label.py", "--benchmark", "rotation-theta", "--adv-type", "3d2fool"],
     # ["python", "./export_datasets_with_coco_label.py", "--benchmark", "rotation-theta", "--adv-type", "poopatch"],
@@ -68,7 +68,7 @@ commands = [
     # ["python", "./export_datasets_with_coco_label.py", "--benchmark", "spot", "--adv-type", "clean"],
     # ["python", "./export_datasets_with_coco_label.py", "--benchmark", "spot", "--adv-type", "random"],
 
-    # walker
+    # # walker
     ["python", "./export_datasets_with_coco_label.py", "--benchmark", "rotation-theta", "--actor-type", "walker", "--adv-type", "advcam"],
     ["python", "./export_datasets_with_coco_label.py", "--benchmark", "rotation-theta", "--actor-type", "walker", "--adv-type", "advcat"],
     ["python", "./export_datasets_with_coco_label.py", "--benchmark", "rotation-theta", "--actor-type", "walker", "--adv-type", "advpattern"],
@@ -82,7 +82,7 @@ commands = [
     ["python", "./export_datasets_with_coco_label.py", "--benchmark", "rotation-theta", "--actor-type", "walker", "--adv-type", "natpatch"],
     ["python", "./export_datasets_with_coco_label.py", "--benchmark", "rotation-theta", "--actor-type", "walker", "--adv-type", "upc"],
     ["python", "./export_datasets_with_coco_label.py", "--benchmark", "rotation-theta", "--actor-type", "walker", "--adv-type", "mtd"],
-    ["python", "./export_datasets_with_coco_label.py", "--benchmark", "rotation-theta", "--actor-type", "walker", "--adv-type", "clean"]
+    ["python", "./export_datasets_with_coco_label.py", "--benchmark", "rotation-theta", "--actor-type", "walker", "--adv-type", "clean"],
 
     ["python", "./export_datasets_with_coco_label.py", "--benchmark", "weather", "--actor-type", "walker", "--adv-type", "advcam"],
     ["python", "./export_datasets_with_coco_label.py", "--benchmark", "weather", "--actor-type", "walker", "--adv-type", "advcat"],
@@ -97,7 +97,7 @@ commands = [
     ["python", "./export_datasets_with_coco_label.py", "--benchmark", "weather", "--actor-type", "walker", "--adv-type", "natpatch"],
     ["python", "./export_datasets_with_coco_label.py", "--benchmark", "weather", "--actor-type", "walker", "--adv-type", "upc"],
     ["python", "./export_datasets_with_coco_label.py", "--benchmark", "weather", "--actor-type", "walker", "--adv-type", "mtd"],
-    ["python", "./export_datasets_with_coco_label.py", "--benchmark", "weather", "--actor-type", "walker", "--adv-type", "clean"]    
+    ["python", "./export_datasets_with_coco_label.py", "--benchmark", "weather", "--actor-type", "walker", "--adv-type", "clean"],  
 
     ["python", "./export_datasets_with_coco_label.py", "--benchmark", "sphere", "--actor-type", "walker", "--adv-type", "advcam"],
     ["python", "./export_datasets_with_coco_label.py", "--benchmark", "sphere", "--actor-type", "walker", "--adv-type", "advcat"],
@@ -112,7 +112,7 @@ commands = [
     ["python", "./export_datasets_with_coco_label.py", "--benchmark", "sphere", "--actor-type", "walker", "--adv-type", "natpatch"],
     ["python", "./export_datasets_with_coco_label.py", "--benchmark", "sphere", "--actor-type", "walker", "--adv-type", "upc"],
     ["python", "./export_datasets_with_coco_label.py", "--benchmark", "sphere", "--actor-type", "walker", "--adv-type", "mtd"],
-    ["python", "./export_datasets_with_coco_label.py", "--benchmark", "sphere", "--actor-type", "walker", "--adv-type", "clean"]
+    ["python", "./export_datasets_with_coco_label.py", "--benchmark", "sphere", "--actor-type", "walker", "--adv-type", "clean"],
 
     ["python", "./export_datasets_with_coco_label.py", "--benchmark", "distance", "--actor-type", "walker", "--adv-type", "advcam"],
     ["python", "./export_datasets_with_coco_label.py", "--benchmark", "distance", "--actor-type", "walker", "--adv-type", "advcat"],
@@ -127,22 +127,22 @@ commands = [
     ["python", "./export_datasets_with_coco_label.py", "--benchmark", "distance", "--actor-type", "walker", "--adv-type", "natpatch"],
     ["python", "./export_datasets_with_coco_label.py", "--benchmark", "distance", "--actor-type", "walker", "--adv-type", "upc"],
     ["python", "./export_datasets_with_coco_label.py", "--benchmark", "distance", "--actor-type", "walker", "--adv-type", "mtd"],
-    ["python", "./export_datasets_with_coco_label.py", "--benchmark", "distance", "--actor-type", "walker", "--adv-type", "clean"]
+    ["python", "./export_datasets_with_coco_label.py", "--benchmark", "distance", "--actor-type", "walker", "--adv-type", "clean"],
 
-    ["python", "./export_datasets_with_coco_label.py", "--benchmark", "spot", "--actor-type", "walker", "--adv-type", "advcam"],
-    ["python", "./export_datasets_with_coco_label.py", "--benchmark", "spot", "--actor-type", "walker", "--adv-type", "advcat"],
-    ["python", "./export_datasets_with_coco_label.py", "--benchmark", "spot", "--actor-type", "walker", "--adv-type", "advpattern"],
-    ["python", "./export_datasets_with_coco_label.py", "--benchmark", "spot", "--actor-type", "walker", "--adv-type", "advpatch"],
-    ["python", "./export_datasets_with_coco_label.py", "--benchmark", "spot", "--actor-type", "walker", "--adv-type", "advtexture"],
-    ["python", "./export_datasets_with_coco_label.py", "--benchmark", "spot", "--actor-type", "walker", "--adv-type", "advtshirt"],
-    ["python", "./export_datasets_with_coco_label.py", "--benchmark", "spot", "--actor-type", "walker", "--adv-type", "random"],
-    ["python", "./export_datasets_with_coco_label.py", "--benchmark", "spot", "--actor-type", "walker", "--adv-type", "lap"],
-    ["python", "./export_datasets_with_coco_label.py", "--benchmark", "spot", "--actor-type", "walker", "--adv-type", "dap"],
-    ["python", "./export_datasets_with_coco_label.py", "--benchmark", "spot", "--actor-type", "walker", "--adv-type", "inviscloak"],
-    ["python", "./export_datasets_with_coco_label.py", "--benchmark", "spot", "--actor-type", "walker", "--adv-type", "natpatch"],
-    ["python", "./export_datasets_with_coco_label.py", "--benchmark", "spot", "--actor-type", "walker", "--adv-type", "upc"],
-    ["python", "./export_datasets_with_coco_label.py", "--benchmark", "spot", "--actor-type", "walker", "--adv-type", "mtd"],
-    ["python", "./export_datasets_with_coco_label.py", "--benchmark", "spot", "--actor-type", "walker", "--adv-type", "clean"]
+    # ["python", "./export_datasets_with_coco_label.py", "--benchmark", "spot", "--actor-type", "walker", "--adv-type", "advcam"],
+    # ["python", "./export_datasets_with_coco_label.py", "--benchmark", "spot", "--actor-type", "walker", "--adv-type", "advcat"],
+    # ["python", "./export_datasets_with_coco_label.py", "--benchmark", "spot", "--actor-type", "walker", "--adv-type", "advpattern"],
+    # ["python", "./export_datasets_with_coco_label.py", "--benchmark", "spot", "--actor-type", "walker", "--adv-type", "advpatch"],
+    # ["python", "./export_datasets_with_coco_label.py", "--benchmark", "spot", "--actor-type", "walker", "--adv-type", "advtexture"],
+    # ["python", "./export_datasets_with_coco_label.py", "--benchmark", "spot", "--actor-type", "walker", "--adv-type", "advtshirt"],
+    # ["python", "./export_datasets_with_coco_label.py", "--benchmark", "spot", "--actor-type", "walker", "--adv-type", "random"],
+    # ["python", "./export_datasets_with_coco_label.py", "--benchmark", "spot", "--actor-type", "walker", "--adv-type", "lap"],
+    # ["python", "./export_datasets_with_coco_label.py", "--benchmark", "spot", "--actor-type", "walker", "--adv-type", "dap"],
+    # ["python", "./export_datasets_with_coco_label.py", "--benchmark", "spot", "--actor-type", "walker", "--adv-type", "inviscloak"],
+    # ["python", "./export_datasets_with_coco_label.py", "--benchmark", "spot", "--actor-type", "walker", "--adv-type", "natpatch"],
+    # ["python", "./export_datasets_with_coco_label.py", "--benchmark", "spot", "--actor-type", "walker", "--adv-type", "upc"],
+    # ["python", "./export_datasets_with_coco_label.py", "--benchmark", "spot", "--actor-type", "walker", "--adv-type", "mtd"],
+    # ["python", "./export_datasets_with_coco_label.py", "--benchmark", "spot", "--actor-type", "walker", "--adv-type", "clean"],
 
     ["python", "./export_datasets_with_coco_label.py", "--benchmark", "rotation-phi", "--actor-type", "walker", "--adv-type", "advcam"],
     ["python", "./export_datasets_with_coco_label.py", "--benchmark", "rotation-phi", "--actor-type", "walker", "--adv-type", "advcat"],
@@ -157,7 +157,7 @@ commands = [
     ["python", "./export_datasets_with_coco_label.py", "--benchmark", "rotation-phi", "--actor-type", "walker", "--adv-type", "natpatch"],
     ["python", "./export_datasets_with_coco_label.py", "--benchmark", "rotation-phi", "--actor-type", "walker", "--adv-type", "upc"],
     ["python", "./export_datasets_with_coco_label.py", "--benchmark", "rotation-phi", "--actor-type", "walker", "--adv-type", "mtd"],
-    ["python", "./export_datasets_with_coco_label.py", "--benchmark", "rotation-phi", "--actor-type", "walker", "--adv-type", "clean"]
+    ["python", "./export_datasets_with_coco_label.py", "--benchmark", "rotation-phi", "--actor-type", "walker", "--adv-type", "clean"],
 
 ]
 

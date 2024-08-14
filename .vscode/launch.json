@@ -11,9 +11,9 @@
             "program": "export_datasets_with_coco_label.py",
             "console": "integratedTerminal",
             "args": [
-                "--benchmark", "spot",
-                "--actor-type", "walker",
-                "--adv-type", "clean",
+                "--benchmark", "distance",
+                "--actor-type", "static",
+                "--adv-type", "streetsign01",
             ]
         }
     ]

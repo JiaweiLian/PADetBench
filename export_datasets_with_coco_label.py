@@ -17,14 +17,14 @@ def run(
         actor_type = 'vehicle'  # Define the actor type
 ):
     
-    # create a vehicle
-    vehicle = Actor(world)
+    # create a actor
+    actor = Actor(world)
 
     # weather_update_freq = 0.1 / speed_weather_changing
     weather = Weather(world)
 
     # create a camera
-    camera = Camera(world, vehicle)
+    camera = Camera(world, actor)
 
     # Create the dataset generator
     datasetGenerator = DatasetGenerator(world, camera, save_path, dataset_name, actor_type)
@@ -32,8 +32,8 @@ def run(
     iteration_len = len(settings['theta_list'])
     for i in range(iteration_len):
         print(settings['spawnpoint_list'][i].location)
-        vehicle.create_actor(settings['blueprint_list'][i], settings['spawnpoint_list'][i])
-        camera.follow(vehicle)
+        actor.create_actor(settings['blueprint_list'][i], settings['spawnpoint_list'][i])
+        camera.follow(actor)
         camera.rotate(settings['theta_list'][i], settings['phi_list'][i])
         camera.dolly(settings['radius_list'][i])
         
@@ -52,8 +52,8 @@ def run(
     
     datasetGenerator.annotation_save()
 
-    # Destroy the vehicle
-    del vehicle
+    # Destroy the actor
+    del actor
 
 
 def world_init(map):
@@ -93,6 +93,8 @@ def settings_complete(blueprint_list, settings, actor_type, grid=True):
             settings['blueprint_list'] = [blueprint for blueprint in blueprint_list if blueprint.id.find('audi.etron')!=-1]
         if actor_type == 'walker':
             settings['blueprint_list'] = [blueprint for blueprint in blueprint_list if blueprint.id.find('pedestrian.female1_v1')!=-1]
+        if actor_type == 'static':
+            settings['blueprint_list'] = [blueprint for blueprint in blueprint_list if blueprint.id.find('prop.streetsign01')!=-1]
     if 'weather_list' not in settings:
         # weather_delta = 1000 represents sunny weather
         settings['weather_list'] = [1000]
@@ -104,6 +106,8 @@ def settings_complete(blueprint_list, settings, actor_type, grid=True):
         if actor_type == 'vehicle':
             settings['radius_list'] = [7]
         if actor_type == 'walker':
+            settings['radius_list'] = [2]
+        if actor_type == 'static':
             settings['radius_list'] = [2]
 
     if grid:
@@ -120,6 +124,7 @@ def get_blueprint_list(world, actor_type='vehicle', adv_type='clean'):
     example_types = dict()
     example_types['vehicle'] = ['audi.etron', 'tesla.model3', 'nissan.patrol_2021', 'mercedes.coupe_2020', 'bmw.grandtourer', 'chevrolet.impala', 'jeep.wrangler_rubicon', 'mini.cooper_s_2021', 'mercedes.sprinter', 'lincoln.mkz_2020']
     example_types['walker'] = ['pedestrian.kid1_v1', 'pedestrian.female1_v1', 'pedestrian.male1_v1']
+    example_types['static'] = ['static.prop.streetsign01']
     world_blueprint_list = world.get_blueprint_library().filter(actor_type+'.*')
     
     # filter the example types in the blueprint list
@@ -145,8 +150,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--save_path', type=str, default='data', help='Name of the output directory')
     parser.add_argument('--map', type=str, default='Town10HD_Opt', help='Name of the map')
-    parser.add_argument('--actor-type', type=str, default='vehicle', choices=['vehicle', 'walker'], help='Name of the dataset')
-    parser.add_argument('--adv-type', type=str, default='clean', choices=['clean', 'random', 'active', 'fca', 'dta', 'camou', '3d2fool', 'poopatch', 'rpau', 'appa', 'advcam', 'advtshirt', 'advcat', 'advpattern', 'advpatch', 'inviscloak', 'advtexture', 'dap', 'lap', 'mtd', 'natpatch', 'upc'], help='Name of the dataset')
+    parser.add_argument('--actor-type', type=str, default='vehicle', choices=['vehicle', 'walker', 'static'], help='Name of the dataset')
+    parser.add_argument('--adv-type', type=str, default='clean', choices=['clean', 'random', 'active', 'fca', 'dta', 'camou', '3d2fool', 'poopatch', 'rpau', 'appa', 'advcam', 'advtshirt', 'advcat', 'advpattern', 'advpatch', 'inviscloak', 'advtexture', 'dap', 'lap', 'mtd', 'natpatch', 'upc', 'streetsign01'], help='Name of the dataset')
     parser.add_argument('--benchmark', type=str, default='entire', choices=['vehicle', 'weather', 'distance', 'rotation-theta', 'rotation-phi', 'sphere', 'spot', 'entire'], help='Name of the benchmark')
     args = parser.parse_args()
 
@@ -160,10 +165,21 @@ if __name__ == '__main__':
         distance_range = (5,15)  # distance range for vehicle benchmark
     elif args.actor_type == 'walker':
         distance_range = (1,5)  # distance range for walker benchmark
+    elif args.actor_type == 'static':
+        distance_range = (1,5)  # distance range for walker benchmark
 
-    settings = dict()
+    settings = dict()        
 
     # benchmark settings
+
+    if args.actor_type == 'static':
+        phi_len = 4
+        decompose_dataset_len = default_dataset_len//phi_len
+        settings['phi_list'] = [i/phi_len/9.0 * (2 * math.pi) + math.pi/2 for i in range(phi_len)]
+        settings['radius_list'] = [rescale(i/decompose_dataset_len, *distance_range) for i in range(decompose_dataset_len)]
+        settings['theta_list'] = [math.pi/2]
+        settings['spawnpoint_list'] = world.get_map().get_spawn_points()[35]
+
     if args.benchmark == 'vehicle':
         theta_len = 3
         phi_len = 8
@@ -193,8 +209,8 @@ if __name__ == '__main__':
         settings['theta_list'] = [i/(decompose_dataset_len+1) * (math.pi / 2) for i in range(1, decompose_dataset_len+1)] # without theta = 0, i.e., no overhead view
         settings['phi_list'] = [i/decompose_dataset_len * (2 * math.pi) for i in range(decompose_dataset_len)]
 
-    if args.benchmark == 'distance':
-        phi_len = 8
+    if args.benchmark == 'distance' and args.actor_type != 'static':
+        phi_len = 4
         decompose_dataset_len = default_dataset_len//phi_len
         settings['phi_list'] = [i/phi_len * (2 * math.pi) for i in range(phi_len)]
         settings['radius_list'] = [rescale(i/decompose_dataset_len, *distance_range) for i in range(decompose_dataset_len)]
@@ -210,6 +226,7 @@ if __name__ == '__main__':
         settings['theta_list'] = [i/theta_len * (math.pi / 2) for i in range(1, theta_len)] # without theta = 0, i.e., no overhead view
         settings['phi_list'] = [i/phi_len * (2 * math.pi) for i in range(phi_len)]
         settings['radius_list'] = [rescale(i/distance_len, *distance_range) for i in range(distance_len)]
+    
 
     settings = settings_complete(blueprint_list, settings, args.actor_type)
 
