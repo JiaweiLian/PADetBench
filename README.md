@@ -6,6 +6,8 @@
 
 PADetBench is a comprehensive benchmark designed to evaluate the robustness of object detection models against physical attacks. It addresses the challenges associated with conducting real-world physical experiments, which are often time-consuming, labor-intensive, and difficult to standardize. By leveraging realistic simulation, PADetBench ensures a fair and rigorous evaluation of physical attacks under controlled physical dynamics and cross-domain transformations.
 
+![](./images/overview.pdf)
+
 ## Features
 
 - **20 Physical Attack Methods**: A wide range of physical attack strategies tailored specifically for object detection tasks.
