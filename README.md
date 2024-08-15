@@ -111,7 +111,7 @@ Before running experiments, the users can customize their adversarial objects, p
     ```bash
     python plots-bar.py --data-path results/vehicle.csv --save-path results/vehicle-bar.pdf
     ```
-For Detection and Evaluation, please refer to [file](./auto-detect-validation/README.md) for details.
+For Detection and Evaluation, please refer to the [file](./auto-detect-validation/README.md) for details.
 
 ## Citation
 
