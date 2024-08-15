@@ -1,0 +1,6 @@
+.running*
+*.log
+dataset
+checkpoints
+results
+__pycache__
