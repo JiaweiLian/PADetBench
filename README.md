@@ -32,9 +32,16 @@ PADetBench is a comprehensive benchmark designed to evaluate the robustness of o
 - **Cross-Domain Transformation Control**: Bridges the gap between physical and digital domains, ensuring that adversarial perturbations survive the transformation process.
 - **Detailed Analysis**: Provides deep insights into the performance of physical attacks and the robustness of object detection models through extensive experiments.
 
-## Dataset
+## Datasets
 
-The dataset is generated using the CARLA simulator, which provides realistic scenes and physical dynamics. The benchmark includes:
+The datasets are generated using the CARLA simulator, which provides realistic scenes and physical dynamics. The benchmark includes:
+
+- **Scenes**: Various environments with different map configurations and spawn points.
+- **Objects**: A diverse range of vehicles (e.g., Audi E-Tron, Tesla Model 3, Nissan Patrol 2021) and pedestrians with adjustable colors and attributes.
+- **Camera Parameters**: Half-ball sample space for camera positioning (radius, polar angle, azimuth angle).
+- **Physical Dynamics**: Continuous variations including sun angles, cloudiness, precipitation, puddles, wind, fog, and wetness.
+
+You can download the datasets from [OneDrive](https://connectpolyu-my.sharepoint.com/:u:/g/personal/23123377r_connect_polyu_hk/EZaKLcwMeQZBkzmI7RJgxXkBqGYFLpqKLIzt1uAmZYWEIg).
 
 - **Scenes**: Various environments with different map configurations and spawn points.
 - **Objects**: A diverse range of vehicles (e.g., Audi E-Tron, Tesla Model 3, Nissan Patrol 2021) and pedestrians with adjustable colors and attributes.
