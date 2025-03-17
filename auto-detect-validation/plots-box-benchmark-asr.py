@@ -1,4 +1,4 @@
-from cgitb import handler
+from cgitb import handler 
 from turtle import color
 import matplotlib
 from matplotlib import legend, pyplot as plt

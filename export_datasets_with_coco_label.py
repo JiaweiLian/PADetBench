@@ -2,7 +2,7 @@ from re import A
 import carla
 import math
 import argparse
-import sys
+import sys 
 import keyboard
 import numpy as np
 from tick import Weather, Camera, Actor

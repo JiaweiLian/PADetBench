@@ -1,7 +1,7 @@
 import os
 import json
 import numpy as np
-import queue
+import queue 
 import cv2
 import carla
 from pascal_voc_writer import Writer

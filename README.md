@@ -49,10 +49,15 @@ You can download the datasets from [OneDrive](https://connectpolyu-my.sharepoint
 - **Physical Dynamics**: Continuous variations including sun angles, cloudiness, precipitation, puddles, wind, fog, and wetness.
 
 ## Installation
-This document describes the installation of the required software to run the Carla simulator (0.9.15). The installation can be finished in two steps **within a few minutes**. 
+
+This document describes the installation of the required software to run the Carla simulator (0.9.15). The installation can be finished in two steps **within a few minutes**.
+
 ### Installation of Docker
+
 For simplicity, we will use Docker to install Carla. First, we need to install Docker with NVIDIA support:
+
 - Add the GPG key for the official NVIDIA repository to the system:
+
 ```bash
 distribution=$(. /etc/os-release;echo $ID$VERSION_ID) \
     && curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg \
@@ -60,32 +65,45 @@ distribution=$(. /etc/os-release;echo $ID$VERSION_ID) \
             sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | \
             sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
 ```
+
 - Install the NVIDIA container toolkit:
+
 ```bash
 sudo apt-get update && sudo apt-get install -y nvidia-docker2
 ```
+
 - Restart the Docker daemon to complete the installation:
+
 ```bash
 sudo systemctl restart docker
 ```
+
 - Verify the installation:
+
 ```bash
 docker run --rm --gpus all nvidia/cuda:11.0-base nvidia-smi
 ```
 
-### Installation of Carla
+### Installation of Carla 
+
 - Allow the X server to accept connections from the Docker container:
+
 ```bash
 xhost +local:root
 ```
+
 - Pull the Carla Docker image:
+
 ```bash
 docker pull carlasim/carla:0.9.15
 ```
+
 - Run the Carla Docker container:
+
 ```bash
 sudo docker run --privileged -p 2000-2002:2000-2002 --runtime=nvidia --gpus all -e DISPLAY=$DISPLAY -e XAUTHORITY=$XAUTHORITY -e SDL_VIDEODRIVER=x11 -v /tmp/.X11-unix:/tmp/.X11-unix -it carlasim/carla:0.9.15 ./CarlaUE4.sh
 ```
+
 Then the UI comes up as below.
 ![](./images/ui_carlaue4.jpg)
 
@@ -98,26 +116,29 @@ Then the UI comes up as below.
    git clone https://github.com/JiaweiLian/PADetBench.git
    ```
 2. Install dependencies:
-    ```bash
-    pip install -r requirements.txt
-    ```
+   ```bash
+   pip install -r requirements.txt
+   ```
+
 ### Running Experiments
 
 Before running experiments, the users can customize their adversarial objects, please refer to [customize_adversarial_objects.md](./documents/customize_adversarial_objects.md)
 
 1. Generate datasets:
-    ```bash
-    python export_datasets_with_coco_label.py --benchmark entire --actor-type vehicle --adv-type random
-    ```
-    The users can adjust the args accordingly as they wish.
+   ```bash
+   python export_datasets_with_coco_label.py --benchmark entire --actor-type vehicle --adv-type random
+   ```
+
+   The users can adjust the args accordingly as they wish.
 2. Detection
-    ```bash
-    python validations.py --detection-path /path/to/detection --gpu 1
-    ```
+   ```bash
+   python validations.py --detection-path /path/to/detection --gpu 1
+   ```
 3. Evaluation
-    ```bash
-    python plots-bar.py --data-path results/vehicle.csv --save-path results/vehicle-bar.pdf
-    ```
+   ```bash
+   python plots-bar.py --data-path results/vehicle.csv --save-path results/vehicle-bar.pdf
+   ```
+
 For Detection and Evaluation, please refer to the [file](./auto-detect-validation/README.md) for details.
 
 ## Citation
@@ -148,7 +169,7 @@ For any inquiries or collaborations, please contact the authors at:
 * Lap-Pui Chau: lap-pui.chau@polyu.edu.hk
 * Shaohui Mei: meish@nwpu.edu.cn
 
-## Acknowledgments  
+## Acknowledgments
 
 The research work was conducted in the JC STEM Lab of Machine Learning and Computer Vision funded by The Hong Kong Jockey Club Charities Trust.
 
